@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext"; // Adjust the path as needed
 import Spinner from "react-native-loading-spinner-overlay";
 
@@ -31,32 +31,35 @@ export default function OrganizationList() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Spinner visible={isLoading} />
-
-
-      <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
-    
-      <Text>Elige tu Establecimiento</Text>
-      <FlatList
-        data={organizations}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => handleSelectOrg(item.id)}
-            style={({ pressed }) => [
-              {
-                padding: 20,
-                backgroundColor: pressed ? "#ddd" : "#f5f5f5",
-                margin: 5,
-              },
-              styles.itemContainer,
-            ]}
-          >
-            <Text>{item.name}</Text>
-          </Pressable>
-        )}
-      />
-
-
+      {userInfo?.token ? (
+        <>
+          <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
+          <Text>Elige tu Establecimiento</Text>
+          <FlatList
+            data={organizations}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => handleSelectOrg(item.id)}
+                style={({ pressed }) => [
+                  {
+                    padding: 20,
+                    backgroundColor: pressed ? "#ddd" : "#f5f5f5",
+                    margin: 5,
+                  },
+                  styles.itemContainer,
+                ]}
+              >
+                <Text>{item.name}</Text>
+              </Pressable>
+            )}
+          />
+        </>
+      ) : (
+        <Link href="/auth/login" style={styles.link}>
+          <Text>Please log in</Text>
+        </Link>
+      )}
     </View>
   );
 }
