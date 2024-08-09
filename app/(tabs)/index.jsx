@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { AuthContext } from "../context/AuthContext"; // Adjust the path as needed
+import { AuthContext } from "../../context/AuthContext"; // Adjust the path as needed
 import Spinnerr from "react-native-loading-spinner-overlay";
 
 const organizations = [

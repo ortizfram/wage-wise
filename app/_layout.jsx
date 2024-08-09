@@ -39,7 +39,7 @@ function Layout() {
       {splahLoading ? (
         <Stack.Screen name="splashScreen" options={{ headerShown: false }} />
       ) : userInfo?.token ? (
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       ) : (
         <>
           <Stack.Screen name="auth/signup" options={{ headerShown: false }} />

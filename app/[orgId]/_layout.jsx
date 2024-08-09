@@ -1,5 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+
 
 export default function OrgDetailLayout() {
   return (
@@ -8,12 +10,18 @@ export default function OrgDetailLayout() {
         name="dashboard"
         options={{
           headerShown:false,
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialIcons name={"dashboard"} size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           headerShown:false,
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialIcons name={"settings"} size={24} color={color} />
+          ),
         }}
       />
     </Tabs>
