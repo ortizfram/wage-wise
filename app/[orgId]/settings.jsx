@@ -1,14 +1,51 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useContext } from "react";
+import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
+import axios from "axios";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RESP_URL } from "../../config";
+import { AuthContext } from "../../context/AuthContext";
+import Spinnerr from "react-native-loading-spinner-overlay";
 
-const settings = () => {
+const Settings = () => {
+  const router = useRouter();
+  const { userInfo, isLoading, logout } = useContext(AuthContext);
+
   return (
-    <View>
-      <Text>settings</Text>
+    <View style={styles.container}>
+      <Spinnerr visible={isLoading} />
+      <Text style={styles.header}>Settings</Text>
+      <Text style={styles.account}>{userInfo ? userInfo.email : ""}</Text>
+
+      <Pressable onPress={logout} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </Pressable>
     </View>
-  )
-}
+  );
+};
 
-export default settings
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  account: {
+    color: "blue",
+  },
+  header: {
+    fontSize: 24,
+    marginBottom: 24,
+  },
+  logoutButton: {
+    padding: 20,
+  },
+  logoutText: {
+    color: "red",
+    fontSize: 18,
+  },
+  
+});
 
-const styles = StyleSheet.create({})
+export default Settings;
