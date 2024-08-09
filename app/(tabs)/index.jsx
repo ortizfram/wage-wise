@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext"; // Adjust the path as needed
-import Spinnerr from "react-native-loading-spinner-overlay";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const organizations = [
   { id: "1", name: "Organization 1" },
@@ -12,14 +12,17 @@ const organizations = [
 
 export default function OrganizationList() {
   const { userInfo, isLoading } = useContext(AuthContext); // Fetch userInfo from context
+  const router = useRouter();
 
   useEffect(() => {
     if (!userInfo) {
       router.push("/auth/login");
-      return null;
     }
-  }, []);
-  const router = useRouter();
+  }, [userInfo]);
+
+  if (!userInfo) {
+    return null; // Or a loading screen or spinner if preferred
+  }
 
   const handleSelectOrg = (orgId) => {
     router.push(`/${orgId}/dashboard`);
@@ -27,9 +30,11 @@ export default function OrganizationList() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Spinnerr visible={isLoading} />
-      <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
+      <Spinner visible={isLoading} />
 
+
+      <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
+    
       <Text>Elige tu Establecimiento</Text>
       <FlatList
         data={organizations}
@@ -50,6 +55,8 @@ export default function OrganizationList() {
           </Pressable>
         )}
       />
+
+
     </View>
   );
 }

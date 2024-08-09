@@ -32,11 +32,17 @@ export default function RootLayout() {
 }
 
 function Layout() {
-  const { userInfo, splahLoading } = useContext(AuthContext);
+  const { userInfo, splashLoading } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (userInfo == null) {
+      router.push("/auth/login");
+    }
+  }, [splashLoading, userInfo]);
 
   return (
     <Stack>
-      {splahLoading ? (
+      {splashLoading ? (
         <Stack.Screen name="splashScreen" options={{ headerShown: false }} />
       ) : userInfo?.token ? (
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
