@@ -5,9 +5,9 @@ import { AuthContext } from "../../context/AuthContext"; // Adjust the path as n
 import Spinner from "react-native-loading-spinner-overlay";
 
 const organizations = [
-  { id: "1", name: "Organization 1" },
-  { id: "2", name: "Organization 2" },
-  { id: "3", name: "Organization 3" },
+  // { id: "1", name: "Organization 1" },
+  // { id: "2", name: "Organization 2" },
+  // { id: "3", name: "Organization 3" },
 ];
 
 export default function OrganizationList() {
@@ -34,26 +34,39 @@ export default function OrganizationList() {
       {userInfo?.token ? (
         <>
           <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
-          <Text>Elige tu Establecimiento</Text>
-          <FlatList
-            data={organizations}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => handleSelectOrg(item.id)}
-                style={({ pressed }) => [
-                  {
-                    padding: 20,
-                    backgroundColor: pressed ? "#ddd" : "#f5f5f5",
-                    margin: 5,
-                  },
-                  styles.itemContainer,
-                ]}
-              >
-                <Text>{item.name}</Text>
+          {organizations.length > 0 ? (
+            <>
+              <Text>Elige tu Establecimiento</Text>
+              <FlatList
+                data={organizations}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => handleSelectOrg(item.id)}
+                    style={({ pressed }) => [
+                      {
+                        padding: 20,
+                        backgroundColor: pressed ? "#ddd" : "#f5f5f5",
+                        margin: 5,
+                      },
+                      styles.itemContainer,
+                    ]}
+                  >
+                    <Text>{item.name}</Text>
+                  </Pressable>
+                )}
+              />
+            </>
+          ) : (
+            <View style={styles.container}>
+              <Text>Not existing organizations for this account yet!</Text>
+              <Pressable style={styles.createBtn}>
+                <Text style={styles.createText}>
+                  (+) Create an Organization
+                </Text>
               </Pressable>
-            )}
-          />
+            </View>
+          )}
         </>
       ) : (
         <Link href="/auth/login" style={styles.link}>
@@ -69,7 +82,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
   },
   selectText: {
     color: "#ffff",
@@ -95,5 +107,13 @@ const styles = StyleSheet.create({
   },
   link: {
     color: "blue",
+  },
+  createBtn: {
+    padding: 10,
+    backgroundColor: "blue",
+    marginVertical: 10,
+  },
+  createText: {
+    color: "white",
   },
 });
