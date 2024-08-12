@@ -45,7 +45,10 @@ function Layout() {
       {splashLoading ? (
         <Stack.Screen name="splashScreen" options={{ headerShown: false }} />
       ) : userInfo?.token ? (
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="organization" options={{ headerShown: false }} />
+        </>
       ) : (
         <>
           <Stack.Screen name="auth/signup" options={{ headerShown: false }} />

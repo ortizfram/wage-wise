@@ -61,7 +61,7 @@ export default function OrganizationList() {
             <View style={styles.container}>
               <Text>Not existing organizations for this account yet!</Text>
               <Pressable style={styles.createBtn}>
-                <Text style={styles.createText}>
+                <Text style={styles.createText} onPress={()=>{router.push("/organization/create")}}>
                   (+) Create an Organization
                 </Text>
               </Pressable>
