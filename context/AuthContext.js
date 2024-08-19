@@ -58,45 +58,48 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       console.log("Sending login request");
-      await axios
-        .post(
-          `${RESP_URL}/api/users/login`,
-          {
-            email,
-            password,
-          },
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          if (res.status === 200) {
-            console.log("Response received, setting token");
-            let userInfo = res.data;
-            console.log(userInfo);
-            setUserInfo(userInfo);
-            AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-            setIsLoading(false);
-            router.push("/");
-          }
-        })
-        .catch((e) => {
-          console.log(`login error: ${e}`);
-          setIsLoading(false);
-        });
+      const res = await axios.post(
+        `${RESP_URL}/api/users/login`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+  
+      if (res.status === 200) {
+        console.log("Response received, setting token");
+        let userInfo = res.data;
+        console.log(userInfo);
+        setUserInfo(userInfo);
+        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+        setIsLoading(false);
+        router.push("/");
+      }
     } catch (error) {
+      setIsLoading(false);
+      let errorMessage = "An unexpected error occurred";
+  
       if (axios.isAxiosError(error)) {
         if (error.response) {
           if (error.response.status === 401) {
-            alert("Invalid credentials");
+            errorMessage = "Invalid credentials. Please check your email and password.";
           } else {
-            alert(`Error logging in: ${error.response.data.message}`);
-            console.log("Error response data:", error.response.data.message);
+            errorMessage = error.response.data.message || errorMessage;
           }
+        } else if (error.request) {
+          errorMessage = "No response from the server. Please try again later.";
         }
       }
+  
+      alert(errorMessage); // Display the error message as an alert
+      console.log(`login error: ${error}`);
     }
   };
+  
+  
 
   const logout = async () => {
     setIsLoading(true);

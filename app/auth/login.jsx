@@ -1,28 +1,29 @@
-import axios from "axios";
-import { Link, useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, TextInput, Pressable, Alert } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
-import Spinnerr from "react-native-loading-spinner-overlay";
+import Spinner from "react-native-loading-spinner-overlay";
+import { Link } from "expo-router";
 
 const Login = () => {
-  const router = useRouter();
+  const { login, isLoading } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading } = useContext(AuthContext);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    setError(""); // Reset error before attempting to login
+    try {
+      await login(email, password);
+    } catch (e) {
+      setError(e.message); // Set error message if login fails
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.appname}>WAGE WISE</Text>
       <Text style={styles.header}>Login</Text>
-      <Spinnerr visible={isLoading} />
+      <Spinner visible={isLoading} />
 
       <TextInput
         style={styles.input}
@@ -39,13 +40,10 @@ const Login = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Pressable
-        onPress={() => {
-          console.log("login button pressed");
-          login(email, password);
-        }}
-        style={styles.button}
-      >
+
+      {error ? <Text style={styles.error}>{error}</Text> : null} {/* Display error if exists */}
+
+      <Pressable onPress={handleLogin} style={styles.button}>
         <Text style={styles.textButton}>Login</Text>
       </Pressable>
       <Pressable style={styles.link}>
@@ -91,5 +89,9 @@ const styles = StyleSheet.create({
   },
   textButton: {
     color: "#e3e3e3",
+  },
+  error: {
+    color: "red",
+    marginBottom: 20,
   },
 });
