@@ -1,18 +1,52 @@
-import React, { useContext, useEffect } from "react";
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
-import { AuthContext } from "../../context/AuthContext"; // Adjust the path as needed
-import Spinner from "react-native-loading-spinner-overlay";
-
-const organizations = [
-  // { id: "1", name: "Organization 1" },
-  // { id: "2", name: "Organization 2" },
-  // { id: "3", name: "Organization 3" },
-];
+import { AuthContext } from "../../context/AuthContext";
+import axios from "axios";
+import { RESP_URL } from "../../config";
 
 export default function OrganizationList() {
-  const { userInfo, isLoading } = useContext(AuthContext); // Fetch userInfo from context
+  const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
+  const [organizations, setOrganizations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (userInfo && userInfo._id) {
+      const fetchOrganizations = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get(
+            `${RESP_URL}/api/organization`,
+            {
+              params: { userId: userInfo._id },
+              headers: {
+                Authorization: `Bearer ${userInfo.token}`,
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
+            }
+          );
+          setOrganizations(response.data);
+        } catch (error) {
+          console.error("Failed to fetch organizations:", error);
+          setError("Failed to fetch organizations");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchOrganizations();
+    }
+  }, [userInfo]);
 
   useEffect(() => {
     if (!userInfo) {
@@ -20,58 +54,74 @@ export default function OrganizationList() {
     }
   }, [userInfo]);
 
-  if (!userInfo) {
-    return null; // Or a loading screen or spinner if preferred
-  }
-
   const handleSelectOrg = (orgId) => {
+    // Implement the logic for handling organization selection
+    // For example, navigate to a details page for the selected organization
     router.push(`/${orgId}/dashboard`);
   };
 
+  if (authLoading || loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>{error}</Text>
+        <Pressable style={styles.createBtn}>
+          <Text
+            style={styles.createText}
+            onPress={() => {
+              router.push("/organization/create");
+            }}
+          >
+            (+) Create an Organization
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Spinner visible={isLoading} />
-      {userInfo?.token ? (
+      <Text style={styles.welcome}>Welcome {userInfo?.email || ""}</Text>
+      {organizations.length > 0 ? (
         <>
-          <Text style={styles.welcome}>Welcome {userInfo.email || ""}</Text>
-          {organizations.length > 0 ? (
-            <>
-              <Text>Elige tu Establecimiento</Text>
-              <FlatList
-                data={organizations}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <Pressable
-                    onPress={() => handleSelectOrg(item.id)}
-                    style={({ pressed }) => [
-                      {
-                        padding: 20,
-                        backgroundColor: pressed ? "#ddd" : "#f5f5f5",
-                        margin: 5,
-                      },
-                      styles.itemContainer,
-                    ]}
-                  >
-                    <Text>{item.name}</Text>
-                  </Pressable>
-                )}
-              />
-            </>
-          ) : (
-            <View style={styles.container}>
-              <Text>Not existing organizations for this account yet!</Text>
-              <Pressable style={styles.createBtn}>
-                <Text style={styles.createText} onPress={()=>{router.push("/organization/create")}}>
-                  (+) Create an Organization
-                </Text>
+          <Text>Elige tu Establecimiento</Text>
+          <FlatList
+            data={organizations}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => handleSelectOrg(item._id)}
+                style={({ pressed }) => [
+                  {
+                    padding: 20,
+                    backgroundColor: pressed ? "#ddd" : "#f5f5f5",
+                    margin: 5,
+                  },
+                  styles.itemContainer,
+                ]}
+              >
+                <Text>{item.name}</Text>
               </Pressable>
-            </View>
-          )}
+            )}
+          />
         </>
       ) : (
-        <Link href="/auth/login" style={styles.link}>
-          <Text>Please log in</Text>
-        </Link>
+        <View style={styles.container}>
+          <Text>No organizations found for this account yet!</Text>
+          <Pressable style={styles.createBtn}>
+            <Text
+              style={styles.createText}
+              onPress={() => {
+                router.push("/organization/create");
+              }}
+            >
+              (+) Create an Organization
+            </Text>
+          </Pressable>
+        </View>
       )}
     </View>
   );
@@ -83,16 +133,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  selectText: {
-    color: "#ffff",
-    marginVertical: 15,
-    fontSize: 32,
-  },
-  name: {
-    color: "#ffff",
-    fontWeight: "bold",
-    fontSize: 20,
-  },
   welcome: {
     marginTop: 15,
     color: "blue",
@@ -100,13 +140,6 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     borderRadius: 8,
-  },
-  org: {
-    color: "blue",
-    fontSize: 20,
-  },
-  link: {
-    color: "blue",
   },
   createBtn: {
     padding: 10,
