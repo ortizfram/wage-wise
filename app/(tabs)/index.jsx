@@ -53,8 +53,6 @@ export default function OrganizationList() {
   }, [userInfo]);
 
   const handleSelectOrg = (orgId) => {
-    // Implement the logic for handling organization selection
-    // For example, navigate to a details page for the selected organization
     router.push(`/${orgId}/dashboard`);
   };
 
@@ -81,11 +79,11 @@ export default function OrganizationList() {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={styles.welcome}>Welcome {userInfo?.email || ""}</Text>
+    <View style={styles.container}>
+      <Text style={styles.welcome}>Bienvenido {userInfo?.email || ""}</Text>
       {organizations.length > 0 ? (
         <>
-          <Text>Elige tu Establecimiento, o</Text>
+          <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
           <Pressable style={styles.createBtn}>
             <Text
               style={styles.createText}
@@ -97,6 +95,8 @@ export default function OrganizationList() {
             </Text>
           </Pressable>
           <FlatList
+            contentContainerStyle={styles.listContainer}
+            style={styles.listBg}
             data={organizations}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
@@ -107,6 +107,7 @@ export default function OrganizationList() {
                     padding: 20,
                     backgroundColor: pressed ? "#ddd" : "#f5f5f5",
                     margin: 5,
+                    width: "100%", // Adjust to fit your design
                     flexDirection: "row",
                     alignItems: "center",
                     borderRadius: 8,
@@ -151,6 +152,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    // padding: 16,
+  },
+  blue: {
+    color: "blue",
+  },
+  listBg: {
+    backgroundColor: "gray",
+    width: "100%",
+  },
+  listContainer: {
+    alignItems: "center", // Center items horizontally
   },
   welcome: {
     marginTop: 15,
@@ -174,7 +186,5 @@ const styles = StyleSheet.create({
   createText: {
     color: "white",
   },
-  pressed: {
-    
-  },
+  pressed: {},
 });
