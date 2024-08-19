@@ -24,17 +24,14 @@ export default function OrganizationList() {
       const fetchOrganizations = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(
-            `${RESP_URL}/api/organization`,
-            {
-              params: { userId: userInfo._id },
-              headers: {
-                Authorization: `Bearer ${userInfo.token}`,
-                "Content-Type": "application/json",
-              },
-              withCredentials: true,
-            }
-          );
+          const response = await axios.get(`${RESP_URL}/api/organization`, {
+            params: { userId: userInfo._id },
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          });
           setOrganizations(response.data);
         } catch (error) {
           console.error("Failed to fetch organizations:", error);
@@ -87,7 +84,17 @@ export default function OrganizationList() {
       <Text style={styles.welcome}>Welcome {userInfo?.email || ""}</Text>
       {organizations.length > 0 ? (
         <>
-          <Text>Elige tu Establecimiento</Text>
+          <Text>Elige tu Establecimiento, o</Text>
+          <Pressable style={styles.createBtn}>
+            <Text
+              style={styles.createText}
+              onPress={() => {
+                router.push("/organization/create");
+              }}
+            >
+              (+) Crea otra organizacion 
+            </Text>
+          </Pressable>
           <FlatList
             data={organizations}
             keyExtractor={(item) => item._id}
