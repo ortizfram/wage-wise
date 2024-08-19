@@ -78,8 +78,10 @@ const CreateOrganizationView = () => {
       <Pressable onPress={handleChooseImage} style={styles.imagePicker}>
         <Text style={styles.imageText}>🏞️ Choose an image</Text>
       </Pressable>
-      {imageUri && (
+      {imageUri ? (
         <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+      ) : (
+        <Image source={require('../../assets/images/org_placeholder.jpg')} style={styles.imagePreview} />
       )}
       <Button title="Submit" onPress={handleSubmit} />
     </View>

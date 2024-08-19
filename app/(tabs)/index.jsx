@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
@@ -92,7 +93,7 @@ export default function OrganizationList() {
                 router.push("/organization/create");
               }}
             >
-              (+) Crea otra organizacion 
+              (+) Crea otra organizacion
             </Text>
           </Pressable>
           <FlatList
@@ -106,10 +107,21 @@ export default function OrganizationList() {
                     padding: 20,
                     backgroundColor: pressed ? "#ddd" : "#f5f5f5",
                     margin: 5,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderRadius: 8,
                   },
                   styles.itemContainer,
                 ]}
               >
+                <Image
+                  source={
+                    item.image
+                      ? { uri: `${RESP_URL}/${item.image}` }
+                      : require("../../assets/images/org_placeholder.jpg")
+                  }
+                  style={styles.image}
+                />
                 <Text>{item.name}</Text>
               </Pressable>
             )}
@@ -145,6 +157,12 @@ const styles = StyleSheet.create({
     color: "blue",
     fontSize: 20,
   },
+  image: {
+    width: 50, // Adjust the size as needed
+    height: 50, // Adjust the size as needed
+    borderRadius: 8,
+    marginRight: 15, // Space between image and text
+  },
   itemContainer: {
     borderRadius: 8,
   },
@@ -155,5 +173,8 @@ const styles = StyleSheet.create({
   },
   createText: {
     color: "white",
+  },
+  pressed: {
+    
   },
 });
