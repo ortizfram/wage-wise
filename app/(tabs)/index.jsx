@@ -12,6 +12,7 @@ import { Link, useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { RESP_URL } from "../../config";
+import InOutClock from "../../components/InOutClock";
 
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
@@ -81,67 +82,73 @@ export default function OrganizationList() {
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>Bienvenido {userInfo?.email || ""}</Text>
-      {organizations.length > 0 ? (
+      {userInfo?.isAdmin ? (
         <>
-          <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
-          <Pressable style={styles.createBtn}>
-            <Text
-              style={styles.createText}
-              onPress={() => {
-                router.push("/organization/create");
-              }}
-            >
-              (+) Crea otra organizacion
-            </Text>
-          </Pressable>
-          <FlatList
-            contentContainerStyle={styles.listContainer}
-            style={styles.listBg}
-            data={organizations}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => handleSelectOrg(item._id)}
-                style={({ pressed }) => [
-                  {
-                    padding: 20,
-                    backgroundColor: pressed ? "#ddd" : "#f5f5f5",
-                    margin: 5,
-                    width: "100%", // Adjust to fit your design
-                    flexDirection: "row",
-                    alignItems: "center",
-                    borderRadius: 8,
-                  },
-                  styles.itemContainer,
-                ]}
-              >
-                <Image
-                  source={
-                    item.image
-                      ? { uri: `${RESP_URL}/${item.image}` }
-                      : require("../../assets/images/org_placeholder.jpg")
-                  }
-                  style={styles.image}
-                />
-                <Text>{item.name}</Text>
+          {organizations.length > 0 ? (
+            <>
+              <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
+              <Pressable style={styles.createBtn}>
+                <Text
+                  style={styles.createText}
+                  onPress={() => {
+                    router.push("/organization/create");
+                  }}
+                >
+                  (+) Crea otra organización
+                </Text>
               </Pressable>
-            )}
-          />
+              <FlatList
+                contentContainerStyle={styles.listContainer}
+                style={styles.listBg}
+                data={organizations}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => handleSelectOrg(item._id)}
+                    style={({ pressed }) => [
+                      {
+                        padding: 20,
+                        backgroundColor: pressed ? "#ddd" : "#f5f5f5",
+                        margin: 5,
+                        width: "100%", // Adjust to fit your design
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderRadius: 8,
+                      },
+                      styles.itemContainer,
+                    ]}
+                  >
+                    <Image
+                      source={
+                        item.image
+                          ? { uri: `${RESP_URL}/${item.image}` }
+                          : require("../../assets/images/org_placeholder.jpg")
+                      }
+                      style={styles.image}
+                    />
+                    <Text>{item.name}</Text>
+                  </Pressable>
+                )}
+              />
+            </>
+          ) : (
+            <View style={styles.container}>
+              <Text>No organizations found for this account yet!</Text>
+              <Pressable style={styles.createBtn}>
+                <Text
+                  style={styles.createText}
+                  onPress={() => {
+                    router.push("/organization/create");
+                  }}
+                >
+                  (+) Create an Organization
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </>
       ) : (
-        <View style={styles.container}>
-          <Text>No organizations found for this account yet!</Text>
-          <Pressable style={styles.createBtn}>
-            <Text
-              style={styles.createText}
-              onPress={() => {
-                router.push("/organization/create");
-              }}
-            >
-              (+) Create an Organization
-            </Text>
-          </Pressable>
-        </View>
+        <InOutClock />
       )}
     </View>
   );
