@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image, Alert, Platform } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Adjust the icon set if needed
@@ -32,6 +32,32 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Error deleting organization:", error);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (Platform.OS === "web") {
+      // Web-specific alert using native confirm dialog
+      if (window.confirm("Seguro quieres eliminar esta organizacion? No puedes deshacer esta accion.")) {
+        deleteOrg();
+      }
+    } else {
+      // Native mobile alert for iOS/Android
+      Alert.alert(
+        "Confirmar",
+        "Seguro quieres eliminar esta organizacion? No puedes deshacer esta accion.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Delete",
+            onPress: deleteOrg,
+            style: "destructive", // iOS only: highlights the "Delete" button in red
+          },
+        ]
+      );
     }
   };
 
@@ -78,7 +104,7 @@ export default function Dashboard() {
           <Text style={styles.gridText}>Adelanto de Sueldo</Text>
         </Pressable>
       </View>
-      <Pressable style={styles.deleteButton} onPress={deleteOrg}>
+      <Pressable style={styles.deleteButton} onPress={confirmDelete}>
         <Icon name="delete" size={24} color="white" />
         <Text style={styles.deleteButtonText}>Eliminar Organización</Text>
       </Pressable>
