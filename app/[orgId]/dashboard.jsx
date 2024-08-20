@@ -1,19 +1,31 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { RESP_URL } from "../../config";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Adjust the icon set if needed
+import { RESP_URL } from "../../config";
 
 export default function Dashboard() {
   const { orgId } = useLocalSearchParams();
   const router = useRouter();
+  const [organization, setOrganization] = useState(null);
+
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      try {
+        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`);
+        setOrganization(response.data);
+      } catch (error) {
+        console.error("Error fetching organization:", error);
+      }
+    };
+
+    fetchOrganization();
+  }, [orgId]);
 
   const deleteOrg = async () => {
     try {
-      const response = await axios.delete(
-        `${RESP_URL}/api/organization/${orgId}`
-      );
+      const response = await axios.delete(`${RESP_URL}/api/organization/${orgId}`);
       if (response.status === 200) {
         console.log("Organization deleted");
         router.push("/");
@@ -25,7 +37,21 @@ export default function Dashboard() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Dashboard for Organization {orgId}</Text>
+      {organization ? (
+        <View style={styles.header}>
+          <Image
+            source={
+              organization.image
+                ? { uri: `${RESP_URL}/${organization.image}` }
+                : require("../../assets/images/org_placeholder.jpg")
+            }
+            style={styles.image}
+          />
+          <Text style={styles.orgName}>{organization.name}</Text>
+        </View>
+      ) : (
+        <Text>Loading organization details...</Text>
+      )}
       <View style={styles.gridContainer}>
         <Pressable style={styles.gridItem} onPress={() => router.push("/employees")}>
           <Icon name="people" size={30} color="#007bff" />
@@ -54,7 +80,7 @@ export default function Dashboard() {
       </View>
       <Pressable style={styles.deleteButton} onPress={deleteOrg}>
         <Icon name="delete" size={24} color="white" />
-        <Text style={styles.deleteButtonText}>Eliminar esta Organización y sus datos</Text>
+        <Text style={styles.deleteButtonText}>Eliminar Organización</Text>
       </Pressable>
     </View>
   );
@@ -66,10 +92,22 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f5f5f5",
   },
-  title: {
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    marginRight: 10,
+  },
+  orgName: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: "#333",
   },
   gridContainer: {
     flex: 1,
@@ -98,7 +136,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: "red",
-    padding: 10,
+    padding: 3,
     borderRadius: 5,
     marginTop: 20, // Ensures it's at the bottom
     alignItems: "center",
