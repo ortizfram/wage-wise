@@ -14,11 +14,11 @@ const Settings = () => {
   return (
     <View style={styles.container}>
       <Spinnerr visible={isLoading} />
-      <Text style={styles.header}>Settings</Text>
+      <Text style={styles.header}>Configuraciones</Text>
       <Text style={styles.account}>{userInfo ? userInfo.email : ""}</Text>
 
       <Pressable onPress={logout} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text style={styles.logoutText}>Salir de esta cuenta</Text>
       </Pressable>
     </View>
   );
