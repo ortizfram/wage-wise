@@ -8,10 +8,9 @@ const BePart = () => {
   const { orgId } = useLocalSearchParams();
   const [organization, setOrganization] = useState(null);
 
-  const sendReq = ()=>{
-    console.log("enviando...")
-
-  }
+  const sendReq = () => {
+    console.log("enviando...");
+  };
 
   useEffect(() => {
     const fetchOrganization = async () => {
