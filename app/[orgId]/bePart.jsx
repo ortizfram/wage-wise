@@ -1,15 +1,28 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import React, { useContext, useEffect, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
 import { RESP_URL } from "../../config";
+import { AuthContext } from "../../context/AuthContext";
 
 const BePart = () => {
   const { orgId } = useLocalSearchParams();
   const [organization, setOrganization] = useState(null);
+  const router = useRouter();
+  const userInfo = useContext(AuthContext);
 
-  const sendReq = () => {
+  const sendReq = async () => {
     console.log("enviando...");
+    await axios
+      .post(`${RESP_URL}/api/organization/${orgId}/bePart`, {
+        uid:userInfo._id
+      })
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          console.log("enviado: ", res.data);
+          router.push(`/${orgId}/bePartSent`);
+        }
+      });
   };
 
   useEffect(() => {
