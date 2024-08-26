@@ -13,24 +13,39 @@ const BePart = () => {
 
   const sendReq = async () => {
     console.log("enviando...");
-    await axios
-      .post(`${RESP_URL}/api/organization/${orgId}/bePart`, {
-        uid:userInfo._id
-      })
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
-          console.log("enviado: ", res.data);
-          router.push(`/${orgId}/bePartSent`);
-        }
+    try {
+      const res = await axios.post(`${RESP_URL}/api/organization/${orgId}/bePart`, {
+        uid: userInfo._id
       });
+
+      if (res.status === 200 || res.status === 201) {
+        console.log("Request sent:", res.data);
+
+        // Send email to the organization owner
+        const emailRes = await axios.post(`${RESP_URL}/api/sendEmail`, {
+          ownerId: organization.ownerId, // Assuming you have ownerId in the organization object
+          uid: userInfo._id,
+          subject: "Request to Join Organization",
+          text: `User ${userInfo.name} wants to join your organization.`,
+          html: `<p>User <strong>${userInfo.name}</strong> wants to join your organization.</p>`
+        });
+
+        if (emailRes.status === 200 || emailRes.status === 201) {
+          console.log("Email sent:", emailRes.data);
+          router.push(`/${orgId}/bePartSent`);
+        } else {
+          console.error("Failed to send email:", emailRes);
+        }
+      }
+    } catch (error) {
+      console.error("Error during sendReq:", error);
+    }
   };
 
   useEffect(() => {
     const fetchOrganization = async () => {
       try {
-        const response = await axios.get(
-          `${RESP_URL}/api/organization/${orgId}`
-        );
+        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`);
         setOrganization(response.data);
       } catch (error) {
         console.error("Error fetching organization:", error);
