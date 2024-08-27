@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import SearchOrganization from "../../components/searchOrganization";
 import InOutClock from "../../components/InOutClock";
+import { RESP_URL } from "../../config";
+import axios from "axios";
 
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
@@ -16,13 +18,27 @@ export default function OrganizationList() {
     console.log("userInfo.user = ", JSON.stringify(userInfo.user));
   }, [userInfo]);
 
-  const handleSelectOrg = (orgId) => {
-    if (userInfo?.user?.organization_id) {
-      router.push(`/${orgId}/dashboard`);
-    } else {
-      router.push(`/${orgId}/bePart`);
-    }
-  };
+  const handleSelectOrg = async (orgId) => {
+      /** go dashboard if i'm part of the organization,also if i'm org Admin. else Join **/
+      try {
+        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+  
+        const organization = response.data;
+        if (organization.user_id === userInfo._id) {
+          router.push(`/${orgId}/dashboard`);
+        } else {
+          router.push(`/${orgId}/bePart`);
+        }
+      } catch (error) {
+        console.error("Failed to fetch organization details:", error);
+      }
+    };
 
   if (authLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
