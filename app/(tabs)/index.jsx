@@ -67,7 +67,7 @@ export default function OrganizationList() {
           />
         </>
       ) : userInfo?.user?.organization_id ? (
-        <InOutClock />
+        <InOutClock orgId={userInfo?.user?.organization_id}/>
       ) : (
         <>
           <Text style={styles.blue}>
