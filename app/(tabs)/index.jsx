@@ -1,11 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import SearchOrganization from "../../components/searchOrganization";
@@ -19,14 +13,14 @@ export default function OrganizationList() {
     if (!userInfo) {
       router.push("/auth/login");
     }
-    console.log("userInfo.organization_id = ",JSON.stringify(userInfo.organization_id))
+    console.log("userInfo.user = ", JSON.stringify(userInfo.user));
   }, [userInfo]);
 
   const handleSelectOrg = (orgId) => {
-    {
-      userInfo?.organization_id
-        ? router.push(`/${orgId}/dashboard`)
-        : router.push(`/${orgId}/bePart`);
+    if (userInfo?.user?.organization_id) {
+      router.push(`/${orgId}/dashboard`);
+    } else {
+      router.push(`/${orgId}/bePart`);
     }
   };
 
@@ -56,7 +50,7 @@ export default function OrganizationList() {
             onSelectOrg={handleSelectOrg}
           />
         </>
-      ) : userInfo?.organization_id ? (
+      ) : userInfo?.user?.organization_id ? (
         <InOutClock />
       ) : (
         <>
