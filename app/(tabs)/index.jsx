@@ -19,6 +19,7 @@ export default function OrganizationList() {
     if (!userInfo) {
       router.push("/auth/login");
     }
+    console.log("userInfo.organization_id = ",JSON.stringify(userInfo.organization_id))
   }, [userInfo]);
 
   const handleSelectOrg = (orgId) => {
