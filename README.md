@@ -18,6 +18,8 @@
 
 ## [] - 🧑‍🤝‍🧑 roles * crear * asignar *  hourly_fee * declared_hours * travel_cost
 
+## [] - 📊 fix tabar navigation conditional
+
 # []- 🔔 Alertas y notificaciones a owners y dentro de app .
 
 # [] - 🪣 if org deleted, delete records, and empty User organization_id
