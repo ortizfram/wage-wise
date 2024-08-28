@@ -10,5 +10,16 @@
 
 ## [] - ✏️corregir un registro -> lista empleado
 
+## [] - 📑 Descargar reporte usuario como PDF
+
+## [] - ◀️◀️ move all employees to x org
+
+## [] - ◀️ move 1 employee to x org
+
 ## [] - 🧑‍🤝‍🧑 roles * crear * asignar *  hourly_fee * declared_hours * travel_cost
+
 # []- 🔔 Alertas y notificaciones a owners y dentro de app .
+
+# [] - 🪣 if org deleted, delete records, and empty User organization_id
+
+# [] - 🪣 if role deleted, user role null not required
