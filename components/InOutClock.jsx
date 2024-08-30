@@ -3,12 +3,16 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import axios from "axios";
 import { RESP_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
+import { Alert } from "react-native-web";
+import { format } from "date-fns-tz";
 
 const InOutClock = ({ orgId }) => {
   const { userInfo } = useContext(AuthContext);
   const [org, setOrg] = useState(null);
   const [isEgresoVisible, setIsEgresoVisible] = useState(false);
   const [isIngresoVisible, setIsIngresoVisible] = useState(true);
+  const [inTime, setInTime] = useState(null); // Track the in-time
+  const [outTime, setOutTime] = useState(null); // Track the out-time
 
   const fetchOrg = async () => {
     try {
@@ -34,16 +38,83 @@ const InOutClock = ({ orgId }) => {
     fetchOrg();
   }, []);
 
-  const handleIngresoPress = () => {
-    console.log("Handle Ingreso action");
-    setIsEgresoVisible(true);
-    setIsIngresoVisible(false);
+  const timeZone = "America/Argentina/Buenos_Aires";
+
+  const handleIngresoPress = async () => {
+    const now = new Date();
+    const currentInTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone }); // Convert current time to ART
+    setInTime(currentInTime);
+
+    try {
+      const response = await axios.post(
+        `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
+        {
+          inTime: currentInTime, // Send the in-time as ISO string
+          shiftMode: "regular",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setIsEgresoVisible(true);
+        setIsIngresoVisible(false);
+      } else {
+        console.log("Failed to create shift");
+        Alert.alert("Error", "Failed to clock in. Please try again.");
+      }
+    } catch (error) {
+      console.log("Error during handleIngresoPress:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred during clock in. Please try again."
+      );
+    }
   };
 
-  const handleEgresoPress = () => {
-    console.log("Handle Egreso action");
-    setIsEgresoVisible(false);
-    setIsIngresoVisible(true);
+  const handleEgresoPress = async () => {
+    const now = new Date();
+    const currentOutTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", {
+      timeZone,
+    }); // Convert current time to ART
+    setOutTime(currentOutTime);
+
+    try {
+      const response = await axios.post(
+        `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
+        {
+          inTime: inTime, // Use the stored in-time as ISO string
+          outTime: currentOutTime, // Send the out-time as ISO string
+          shiftMode: "regular",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setIsEgresoVisible(false);
+        setIsIngresoVisible(true);
+        setInTime(null); // Reset in-time
+        setOutTime(null); // Reset out-time
+      } else {
+        console.log("Failed to complete shift");
+        Alert.alert("Error", "Failed to clock out. Please try again.");
+      }
+    } catch (error) {
+      console.log("Error during handleEgresoPress:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred during clock out. Please try again."
+      );
+    }
   };
 
   return (
@@ -65,9 +136,9 @@ const InOutClock = ({ orgId }) => {
         <Text>Loading organization details...</Text>
       )}
       {isIngresoVisible && (
-      <Pressable style={styles.actionBtn} onPress={handleIngresoPress}>
-        <Text style={styles.actionText}>Ingreso</Text>
-      </Pressable>
+        <Pressable style={styles.actionBtn} onPress={handleIngresoPress}>
+          <Text style={styles.actionText}>Ingreso</Text>
+        </Pressable>
       )}
       {isEgresoVisible && (
         <Pressable style={styles.actionBtnL} onPress={handleEgresoPress}>
@@ -89,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   image: {
-    width: 100, // Adjusted size for visibility
+    width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
@@ -133,11 +204,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   actionText: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "600",
-  },
-  actionTextLeave: {
     fontSize: 18,
     color: "#fff",
     fontWeight: "600",
