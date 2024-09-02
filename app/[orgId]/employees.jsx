@@ -1,4 +1,10 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import fetchOrganization from "../../services/organization/fetchOrganization";
@@ -19,7 +25,7 @@ const Employees = () => {
         console.error("Failed to load organization:", error);
       }
     };
-    
+
     const loadEmployees = async () => {
       try {
         const data = await fetchEmployees(orgId);
@@ -33,16 +39,18 @@ const Employees = () => {
     loadEmployees();
   }, [orgId]);
 
-  const handlePress = (employeeId) => {
-    router.push(`/employee/${employeeId}`);
+  const handlePress = (empId) => {
+    router.push(`${empId}`);
   };
 
   const renderEmployee = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.employeeContainer} 
+    <TouchableOpacity
+      style={styles.employeeContainer}
       onPress={() => handlePress(item._id)}
     >
-      <Text>{item.firstname} {item.lastname}</Text>
+      <Text>
+        {item.firstname} {item.lastname}
+      </Text>
       <Text>{item.email}</Text>
     </TouchableOpacity>
   );
