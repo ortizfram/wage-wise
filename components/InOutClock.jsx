@@ -79,43 +79,42 @@ const InOutClock = ({ orgId }) => {
   const handleEgresoPress = async () => {
     const now = new Date();
     const currentOutTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", {
-      timeZone,
+        timeZone,
     }); // Convert current time to ART
     setOutTime(currentOutTime);
 
     try {
-      const response = await axios.post(
-        `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
-        {
-          inTime: inTime, // Use the stored in-time as ISO string
-          outTime: currentOutTime, // Send the out-time as ISO string
-          shiftMode: "regular",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        const response = await axios.put(
+            `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
+            {
+                outTime: currentOutTime, // Send the out-time as ISO string
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${userInfo.token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
-      if (response.status === 201) {
-        setIsEgresoVisible(false);
-        setIsIngresoVisible(true);
-        setInTime(null); // Reset in-time
-        setOutTime(null); // Reset out-time
-      } else {
-        console.log("Failed to complete shift");
-        Alert.alert("Error", "Failed to clock out. Please try again.");
-      }
+        if (response.status === 200) {
+            setIsEgresoVisible(false);
+            setIsIngresoVisible(true);
+            setInTime(null); // Reset in-time
+            setOutTime(null); // Reset out-time
+        } else {
+            console.log("Failed to complete shift");
+            Alert.alert("Error", "Failed to clock out. Please try again.");
+        }
     } catch (error) {
-      console.log("Error during handleEgresoPress:", error);
-      Alert.alert(
-        "Error",
-        "An error occurred during clock out. Please try again."
-      );
+        console.log("Error during handleEgresoPress:", error);
+        Alert.alert(
+            "Error",
+            "An error occurred during clock out. Please try again."
+        );
     }
-  };
+};
+
 
   return (
     <View style={styles.container}>
