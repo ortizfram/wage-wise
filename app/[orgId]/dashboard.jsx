@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Image, Alert, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Image,
+  Alert,
+  Platform,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Adjust the icon set if needed
+import Icon from "react-native-vector-icons/MaterialIcons"; // Adjust the icon set if needed
 import { RESP_URL } from "../../config";
+import fetchOrganization from "../../services/organization/fetchOrganization";
 
 export default function Dashboard() {
   const { orgId } = useLocalSearchParams();
@@ -11,21 +20,23 @@ export default function Dashboard() {
   const [organization, setOrganization] = useState(null);
 
   useEffect(() => {
-    const fetchOrganization = async () => {
+    const loadOrganization = async () => {
       try {
-        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`);
-        setOrganization(response.data);
+        const data = await fetchOrganization(orgId);
+        setOrganization(data);
       } catch (error) {
-        console.error("Error fetching organization:", error);
+        console.error("Failed to load organization:", error);
       }
     };
 
-    fetchOrganization();
+    loadOrganization();
   }, [orgId]);
 
   const deleteOrg = async () => {
     try {
-      const response = await axios.delete(`${RESP_URL}/api/organization/${orgId}`);
+      const response = await axios.delete(
+        `${RESP_URL}/api/organization/${orgId}`
+      );
       if (response.status === 200) {
         console.log("Organization deleted");
         router.push("/");
@@ -38,7 +49,11 @@ export default function Dashboard() {
   const confirmDelete = () => {
     if (Platform.OS === "web") {
       // Web-specific alert using native confirm dialog
-      if (window.confirm("Seguro quieres eliminar esta organizacion? No puedes deshacer esta accion.")) {
+      if (
+        window.confirm(
+          "Seguro quieres eliminar esta organizacion? No puedes deshacer esta accion."
+        )
+      ) {
         deleteOrg();
       }
     } else {
@@ -79,27 +94,45 @@ export default function Dashboard() {
         <Text>Loading organization details...</Text>
       )}
       <View style={styles.gridContainer}>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/employees")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push(`${organization._id}/employees`)}
+        >
           <Icon name="people" size={30} color="#007bff" />
           <Text style={styles.gridText}>Empleados</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/roles")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push("/roles")}
+        >
           <Icon name="group" size={30} color="#007bff" />
           <Text style={styles.gridText}>Roles</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/alerts")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push("/alerts")}
+        >
           <Icon name="notifications" size={30} color="#007bff" />
           <Text style={styles.gridText}>Alertas</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/correct-record")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push("/correct-record")}
+        >
           <Icon name="edit" size={30} color="#007bff" />
           <Text style={styles.gridText}>Corregir un Registro</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/reports")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push("/reports")}
+        >
           <Icon name="assessment" size={30} color="#007bff" />
           <Text style={styles.gridText}>Reportes</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/salary-advance")}>
+        <Pressable
+          style={styles.gridItem}
+          onPress={() => router.push("/salary-advance")}
+        >
           <Icon name="monetization-on" size={30} color="#007bff" />
           <Text style={styles.gridText}>Adelanto de Sueldo</Text>
         </Pressable>
