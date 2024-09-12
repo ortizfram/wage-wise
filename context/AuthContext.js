@@ -98,8 +98,6 @@ export const AuthProvider = ({ children }) => {
       console.log(`login error: ${error}`);
     }
   };
-  
-  
 
   const logout = async () => {
     setIsLoading(true);

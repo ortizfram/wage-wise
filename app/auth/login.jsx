@@ -1,11 +1,18 @@
 import React, { useContext, useState } from "react";
-import { StyleSheet, Text, View, TextInput, Pressable, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Pressable,
+  Alert,
+} from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import Spinner from "react-native-loading-spinner-overlay";
 import { Link } from "expo-router";
 
 const Login = () => {
-  const { login, isLoading } = useContext(AuthContext);
+  const { login, loginWithGoogle, loginWithFacebook, isLoading } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +31,6 @@ const Login = () => {
       <Text style={styles.appname}>WAGE WISE</Text>
       <Text style={styles.header}>Login</Text>
       <Spinner visible={isLoading} />
-
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -40,12 +46,21 @@ const Login = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-
-      {error ? <Text style={styles.error}>{error}</Text> : null} {/* Display error if exists */}
-
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {/* Display error if exists */}
+      
       <Pressable onPress={handleLogin} style={styles.button}>
         <Text style={styles.textButton}>Login</Text>
       </Pressable>
+      
+      <Pressable onPress={loginWithGoogle} style={[styles.button, styles.googleButton]}>
+        <Text style={styles.textButton}>Login with Google</Text>
+      </Pressable>
+      
+      <Pressable onPress={loginWithFacebook} style={[styles.button, styles.facebookButton]}>
+        <Text style={styles.textButton}>Login with Facebook</Text>
+      </Pressable>
+
       <Pressable style={styles.link}>
         <Link href="/auth/signup">
           <Text style={{ color: "blue" }}>I don't have an account yet</Text>
@@ -84,11 +99,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   button: {
-    padding: 20,
+    width: "100%",
+    padding: 15,
     backgroundColor: "blue",
+    alignItems: "center",
+    marginTop: 10,
+    borderRadius: 5,
+  },
+  googleButton: {
+    backgroundColor: "red",
+  },
+  facebookButton: {
+    backgroundColor: "#3b5998",
   },
   textButton: {
     color: "#e3e3e3",
+    fontSize: 16,
   },
   error: {
     color: "red",
