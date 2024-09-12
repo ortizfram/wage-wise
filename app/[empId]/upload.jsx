@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { Text, View, Pressable, TextInput, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  Pressable,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 
 const UploadFile = () => {
@@ -25,8 +32,14 @@ const UploadFile = () => {
         setDoc(fileToUpload);
       }
     });
-    console.log("Doc: " + doc?.uri);
   };
+
+  // Log `doc` after it has been set
+  useEffect(() => {
+    if (doc) {
+      console.log("Doc: " + doc.uri);
+    }
+  }, [doc]);
 
   const postDocument = () => {
     if (!doc) {
@@ -37,13 +50,13 @@ const UploadFile = () => {
     const url = "http://localhost:8000/upload";
     const formData = new FormData();
 
-    // Sobrescribir el nombre del documento si el título ha sido proporcionado
-    const fileToUpload = {
-      ...doc,
-      name: docTitle || doc.name, // Usa el título personalizado si existe
-    };
+    // Append the document
+    formData.append("document", {
+      uri: doc.uri,
+      name: docTitle || doc.name, // Use custom title if provided
+      type: doc.type,
+    });
 
-    formData.append("document", fileToUpload);
     const options = {
       method: "POST",
       body: formData,
@@ -52,8 +65,11 @@ const UploadFile = () => {
         "Content-Type": "multipart/form-data",
       },
     };
-    console.log(formData);
-    fetch(url, options).catch((error) => console.log(error));
+
+    fetch(url, options)
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -61,8 +77,8 @@ const UploadFile = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Sube su documento</Text>
         <Text style={styles.subtitle}>
-          Por favor seleccione y suba de a un documento o foto y asigne un nombre
-          a este
+          Por favor seleccione y suba de a un documento o foto y asigne un
+          nombre a este
         </Text>
 
         <View style={styles.gridContainer}>
@@ -76,7 +92,7 @@ const UploadFile = () => {
             placeholder="2. Escribe aquí el título del documento"
             value={docTitle}
             onChangeText={setDocTitle}
-            placeholderTextColor="#555" // Cambia el color del placeholder si lo deseas
+            placeholderTextColor="#555"
           />
 
           <Pressable style={styles.gridItem} onPress={postDocument}>
@@ -110,10 +126,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   input: {
-    opacity: 0.7, // Reduce la opacidad para el input
-    backgroundColor: "#ddd", // Diferente color de fondo para distinguir del botón
-    textAlign: "center", // Centra horizontalmente el texto del placeholder
-    textAlignVertical: "center", // Centra verticalmente el placeholder (solo en Android)
+    opacity: 0.7,
+    backgroundColor: "#ddd",
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   gridContainer: {
     flex: 1,
