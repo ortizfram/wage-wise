@@ -14,21 +14,21 @@ const Index = () => {
 
         <Pressable
           style={styles.gridItem}
-          onPress={() => router.push("/upload")}
+          onPress={() => router.push(`${empId}/upload`)}
         >
           <Text style={styles.gridText}>Subir Documentos</Text>
         </Pressable>
 
         <Pressable
           style={styles.gridItem}
-          onPress={() => router.push("/files")}
+          onPress={() => router.push(`${empId}/files`)}
         >
           <Text style={styles.gridText}>Buscar Documentos</Text>
         </Pressable>
 
         <Pressable
           style={styles.gridItem}
-          onPress={() => router.push("/reports")}
+          onPress={() => router.push(`${empId}/report`)}
         >
           <Text style={styles.gridText}>Reporte de Horas</Text>
         </Pressable>
