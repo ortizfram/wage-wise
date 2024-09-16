@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         let userInfo = res.data;
         console.log(userInfo);
         setUserInfo(userInfo);
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+        await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
         router.push("/");
       } else {
         console.log("Unexpected status code:", res.status);

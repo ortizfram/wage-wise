@@ -17,60 +17,68 @@ const UploadFile = () => {
     let result = await DocumentPicker.getDocumentAsync({
       type: "*/*",
       copyToCacheDirectory: true,
-    }).then((response) => {
-      if (response.type === "success") {
-        let { name, size, uri } = response;
-        let nameParts = name.split(".");
-        let fileType = nameParts[nameParts.length - 1];
-        var fileToUpload = {
-          name: name,
-          size: size,
-          uri: uri,
-          type: "application/" + fileType,
-        };
-        console.log(fileToUpload, "...............file");
-        setDoc(fileToUpload);
-      }
     });
+  
+    console.log(result); // Check the result object
+  
+    if (result.type === "success") {
+      let { name, size, uri } = result;
+      let nameParts = name.split(".");
+      let fileType = nameParts[nameParts.length - 1];
+      var fileToUpload = {
+        name: name,
+        size: size,
+        uri: uri,
+        type: "application/" + fileType,
+      };
+      console.log(fileToUpload, "Selected file"); // Confirm the file details
+      setDoc(fileToUpload);
+    } else {
+      console.log("Document picking cancelled or failed");
+    }
   };
+  
 
-  // Log `doc` after it has been set
   useEffect(() => {
     if (doc) {
-      console.log("Doc: " + doc.uri);
+      console.log("Selected document: ", doc); // This should print the document details
     }
   }, [doc]);
+  
 
   const postDocument = () => {
-    if (!doc) {
-      alert("Primero seleccione un documento.");
-      return;
-    }
+  if (!doc) {
+    console.log("No document selected"); // Check if this log appears
+    alert("Primero seleccione un documento.");
+    return;
+  }
 
-    const url = "http://localhost:8000/upload";
-    const formData = new FormData();
+  const url = "http://localhost:8000/upload";
+  const formData = new FormData();
 
-    // Append the document
-    formData.append("document", {
-      uri: doc.uri,
-      name: docTitle || doc.name, // Use custom title if provided
-      type: doc.type,
-    });
+  formData.append("document", {
+    uri: doc.uri,
+    name: docTitle || doc.name, // Use custom title if provided
+    type: doc.type,
+  });
 
-    const options = {
-      method: "POST",
-      body: formData,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "multipart/form-data",
-      },
-    };
+  console.log("Uploading document:", formData); // Verify formData before the request
 
-    fetch(url, options)
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.log(error));
+  const options = {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+    },
   };
+
+  fetch(url, options)
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.log(error));
+};
+
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
