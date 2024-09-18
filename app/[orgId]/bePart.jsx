@@ -36,7 +36,6 @@ const BePart = () => {
   };
 
   useEffect(() => {
-    console.log("user", userInfo.user._id);
 
     const fetchOrganization = async () => {
       try {

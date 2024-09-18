@@ -15,7 +15,6 @@ export default function OrganizationList() {
     if (!userInfo) {
       router.push("/auth/login");
     }
-    console.log("userInfo.user = ", JSON.stringify(userInfo.user));
   }, [userInfo]);
 
   const handleSelectOrg = async (orgId) => {
@@ -46,7 +45,7 @@ export default function OrganizationList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Bienvenido {userInfo?.email || ""}</Text>
+      <Text style={styles.welcome}>Bienvenido {userInfo?.user?.email || ""}</Text>
       {userInfo?.isAdmin ? (
         <>
           <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
@@ -66,8 +65,8 @@ export default function OrganizationList() {
             onSelectOrg={handleSelectOrg}
           />
         </>
-      ) : userInfo?.user?.organization_id ? (
-        <InOutClock orgId={userInfo?.user?.organization_id}/>
+      ) : userInfo?.user?.data?.organization_id ? (
+        <InOutClock orgId={userInfo?.user?.data?.organization_id}/>
       ) : (
         <>
           <Text style={styles.blue}>

@@ -132,7 +132,7 @@ const InOutClock = ({ orgId }) => {
           <Text style={styles.title}>{org.name}</Text>
         </>
       ) : (
-        <Text>Loading organization details...</Text>
+        <Text>cargando detalles...</Text>
       )}
       {isIngresoVisible && (
         <Pressable style={styles.actionBtn} onPress={handleIngresoPress}>
