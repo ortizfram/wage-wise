@@ -1,7 +1,7 @@
 import axios from "axios";
 import { RESP_URL } from "../../config";
 
-const fetchEmployees = async (orgId) => {
+export const fetchEmployees = async (orgId) => {
   try {
     const response = await axios.get(
       `${RESP_URL}/api/organization/${orgId}/employees`
@@ -12,5 +12,13 @@ const fetchEmployees = async (orgId) => {
     throw error;
   }
 };
+export const fetchEmployeeWithId = async (uid) => {
+  try {
+    const response = await axios.get(`${RESP_URL}/api/users/${uid}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching employee:", error);
+    throw error;
+  }
+};
 
-export default fetchEmployees;
