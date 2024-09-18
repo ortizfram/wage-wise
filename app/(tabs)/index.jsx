@@ -12,6 +12,7 @@ export default function OrganizationList() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log(userInfo)
     if (!userInfo) {
       router.push("/auth/login");
     }
@@ -29,7 +30,7 @@ export default function OrganizationList() {
         });
   
         const organization = response.data;
-        if (organization.user_id === userInfo._id) {
+        if (organization.user_id === userInfo?.user?._id) {
           router.push(`/${orgId}/dashboard`);
         } else {
           router.push(`/${orgId}/bePart`);
@@ -45,8 +46,8 @@ export default function OrganizationList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Bienvenido {userInfo?.user?.email || ""}</Text>
-      {userInfo?.isAdmin ? (
+      <Text style={styles.welcome}>Bienvenido {userInfo?.user?.isAdmin && <Text>Admin</Text>} {userInfo?.user?.email || ""}</Text>
+      {userInfo?.user?.isAdmin ? (
         <>
           <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
           <Pressable style={styles.createBtn}>
@@ -56,7 +57,7 @@ export default function OrganizationList() {
                 router.push("/organization/create");
               }}
             >
-              (+) Crea otra organización
+              (+) Crea un nuevo establecimiento
             </Text>
           </Pressable>
           <SearchOrganization

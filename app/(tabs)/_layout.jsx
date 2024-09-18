@@ -13,7 +13,7 @@ export default function TabsLayout() {
         name="OrganizationList"
         component={OrganizationList}
         options={{
-          title: "Organizations",
+          title: "Organizaciones",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons name={"home"} size={24} color={color} />
@@ -24,7 +24,7 @@ export default function TabsLayout() {
         name="settings"
         component={Settings}
         options={{
-          title: "Settings",
+          title: "Configuracion",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons name={"settings"} size={24} color={color} />
