@@ -8,7 +8,7 @@ const bePartSent = () => {
       <Text style={styles.messageText}>
         Espera a recibir el correo de aceptación del dueño para acceder a la plataforma y poder marcar.
       </Text>
-      <Text style={styles.noteText}>(Ya puedes cerrar esta ventana)</Text>
+      <Text style={styles.noteText}>(Ir a marcar mi ingreso)</Text>
     </View>
   );
 };
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 14,
-    color: '#777',
+    color: 'blue',
     textAlign: 'center',
     fontStyle: 'italic',
   },

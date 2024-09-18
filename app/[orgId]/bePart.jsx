@@ -6,47 +6,45 @@ import { RESP_URL } from "../../config";
 import { AuthContext } from "../../context/AuthContext";
 
 const BePart = () => {
+  /** !user ? Login : BePart (directamente asociar a org y redirect a marcar)*/
   const { orgId } = useLocalSearchParams();
   const [organization, setOrganization] = useState(null);
   const router = useRouter();
-  const userInfo = useContext(AuthContext);
+  const {userInfo} = useContext(AuthContext);
 
-  const sendReq = async () => {
-    console.log("enviando...");
+  const associate = async () => {
     try {
-      const res = await axios.post(`${RESP_URL}/api/organization/${orgId}/bePart`, {
-        uid: userInfo._id
-      });
+      const res = await axios.post(
+        `${RESP_URL}/api/organization/${orgId}/bePart`,
+        {
+          uid: userInfo.user._id,
+        }
+      );
 
       if (res.status === 200 || res.status === 201) {
-        console.log("Request sent:", res.data);
-
-        // Send email to the organization owner
-        const emailRes = await axios.post(`${RESP_URL}/api/sendEmail`, {
-          ownerId: organization.ownerId, // Assuming you have ownerId in the organization object
-          uid: userInfo._id,
-          subject: "Request to Join Organization",
-          text: `User ${userInfo.name} wants to join your organization.`,
-          html: `<p>User <strong>${userInfo.name}</strong> wants to join your organization.</p>`
-        });
-
-        if (emailRes.status === 200 || emailRes.status === 201) {
-          console.log("Email sent:", emailRes.data);
-          router.push(`/${orgId}/bePartSent`);
-        } else {
-          console.error("Failed to send email:", emailRes);
-        }
+        console.log(
+          "User successfully associated with the organization:",
+          res.data
+        );
+        router.push(`/${orgId}/bePartSent`); // Redirect to confirmation page
+      } else {
+        console.error("Failed to associate user:", res);
       }
     } catch (error) {
-      console.error("Error during sendReq:", error);
+      console.error("Error during association:", error);
     }
   };
 
   useEffect(() => {
+    console.log("user", userInfo.user._id);
+
     const fetchOrganization = async () => {
       try {
-        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`);
+        const response = await axios.get(
+          `${RESP_URL}/api/organization/${orgId}`
+        );
         setOrganization(response.data);
+        console.log(organization);
       } catch (error) {
         console.error("Error fetching organization:", error);
       }
@@ -71,7 +69,7 @@ const BePart = () => {
             />
             <Text style={styles.orgName}>{organization.name}</Text>
           </View>
-          <Pressable style={styles.button} onPress={sendReq}>
+          <Pressable style={styles.button} onPress={associate}>
             <Text style={styles.buttonText}>Enviar solicitud</Text>
           </Pressable>
         </View>
