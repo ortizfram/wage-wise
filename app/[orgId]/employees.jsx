@@ -8,7 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import fetchOrganization from "../../services/organization/fetchOrganization";
-import fetchEmployees from "../../services/organization/fetchEmployees";
+import { fetchEmployees } from "../../services/organization/fetchEmployees";
 
 const Employees = () => {
   const { orgId } = useLocalSearchParams();
