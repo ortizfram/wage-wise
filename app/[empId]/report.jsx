@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, Platform, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Platform,
+} from "react-native";
 import { fetchEmployeeWithId } from "../../services/organization/fetchEmployees";
 import { fetchShiftWithId } from "../../services/userShift/fetchShifts";
 import { useLocalSearchParams } from "expo-router";
@@ -11,6 +17,8 @@ const Report = () => {
   const { empId } = useLocalSearchParams();
   const [employee, setEmployee] = useState({});
   const [shifts, setShifts] = useState([]);
+  const [totalHours, setTotalHours] = useState(0);
+  const [totalMinutes, setTotalMinutes] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -34,6 +42,7 @@ const Report = () => {
           endDate.toISOString().split("T")[0]
         );
         setShifts(data);
+        calculateTotalHours(data); // Calcular horas totales
       } catch (error) {
         console.error("Error fetching shifts:", error);
       }
@@ -63,14 +72,40 @@ const Report = () => {
     }
   };
 
+  const calculateTotalHours = (shifts) => {
+    let hours = 0;
+    let minutes = 0;
+
+    shifts.forEach((shift) => {
+      // Suponiendo que shift.total_hours es algo como "2h 45m"
+      const [h, m] = shift.total_hours.split(" ");
+      hours += parseInt(h.replace("h", ""));
+      minutes += parseInt(m.replace("m", ""));
+    });
+
+    // Si los minutos suman más de 60, convertir en horas
+    hours += Math.floor(minutes / 60);
+    minutes = minutes % 60;
+
+    setTotalHours(hours);
+    setTotalMinutes(minutes);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Reporte de Horas</Text>
 
       {employee && employee.email ? (
-        <Text style={styles.employeeText}>{employee.email}</Text>
+        <View>
+          <Text style={styles.employeeText}>{employee.email}</Text>
+          <Text style={styles.title}>
+            Horas Totales: {totalHours}h {totalMinutes}m
+          </Text>
+        </View>
       ) : (
-        <Text style={styles.errorText}>No se encontraron datos del empleado</Text>
+        <Text style={styles.errorText}>
+          No se encontraron datos del empleado
+        </Text>
       )}
 
       {Platform.OS !== "web" && (
@@ -120,11 +155,14 @@ const Report = () => {
       {shifts.length > 0 ? (
         shifts.map((shift, index) => (
           <Text key={index} style={styles.shiftText}>
-           Día: {shift.date} - Entrada: {shift.in} - Salida: {shift.out}
+            Día: {shift.date} - Entrada: {shift.in} - Salida: {shift.out} -
+            Horas: {shift.total_hours}
           </Text>
         ))
       ) : (
-        <Text style={styles.errorText}>No se encontraron turnos para las fechas seleccionadas</Text>
+        <Text style={styles.errorText}>
+          No se encontraron turnos para las fechas seleccionadas
+        </Text>
       )}
     </View>
   );
