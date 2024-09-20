@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, Platform } from "react-native";
+import { StyleSheet, Text, View, Button, Platform, Pressable } from "react-native";
 import { fetchEmployeeWithId } from "../../services/organization/fetchEmployees";
 import { fetchShiftWithId } from "../../services/userShift/fetchShifts";
 import { useLocalSearchParams } from "expo-router";
-
-// DateTimePicker for mobile (iOS and Android)
 import DateTimePicker from "@react-native-community/datetimepicker";
-
-// DatePicker for web
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Report = () => {
-  const { empId } = useLocalSearchParams(); // Get employee ID
+  const { empId } = useLocalSearchParams();
   const [employee, setEmployee] = useState({});
   const [shifts, setShifts] = useState([]);
-  const [startDate, setStartDate] = useState(new Date()); // Initial start date
-  const [endDate, setEndDate] = useState(new Date()); // Initial end date
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  // Function to load employee and shifts
   useEffect(() => {
     const loadEmployee = async () => {
       try {
@@ -35,7 +30,7 @@ const Report = () => {
       try {
         const data = await fetchShiftWithId(
           empId,
-          startDate.toISOString().split("T")[0], // Format to YYYY-MM-DD
+          startDate.toISOString().split("T")[0],
           endDate.toISOString().split("T")[0]
         );
         setShifts(data);
@@ -46,12 +41,11 @@ const Report = () => {
 
     loadEmployee();
     loadShiftForEmployee();
-  }, [empId, startDate, endDate]); // Dependencies on start and end date
+  }, [empId, startDate, endDate]);
 
-  // Handle date change for Start Date
   const onStartDateChange = (event, selectedDate) => {
     if (Platform.OS === "web") {
-      setStartDate(event); // For web, event is the selected date
+      setStartDate(event);
     } else {
       const currentDate = selectedDate || startDate;
       setShowStartDatePicker(Platform.OS === "ios");
@@ -59,10 +53,9 @@ const Report = () => {
     }
   };
 
-  // Handle date change for End Date
   const onEndDateChange = (event, selectedDate) => {
     if (Platform.OS === "web") {
-      setEndDate(event); // For web, event is the selected date
+      setEndDate(event);
     } else {
       const currentDate = selectedDate || endDate;
       setShowEndDatePicker(Platform.OS === "ios");
@@ -71,30 +64,32 @@ const Report = () => {
   };
 
   return (
-    <View>
-      <Text>Report</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Reporte de Horas</Text>
 
       {employee && employee.email ? (
-        <Text>{employee.email}</Text>
+        <Text style={styles.employeeText}>{employee.email}</Text>
       ) : (
-        <Text>No employee data found</Text>
+        <Text style={styles.errorText}>No se encontraron datos del empleado</Text>
       )}
 
-      {/* Buttons to show date picker for mobile platforms */}
       {Platform.OS !== "web" && (
         <>
-          <Button
-            title="Select Start Date"
+          <Pressable
+            style={styles.button}
             onPress={() => setShowStartDatePicker(true)}
-          />
-          <Button
-            title="Select End Date"
+          >
+            <Text style={styles.buttonText}>Seleccionar Fecha de Inicio</Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
             onPress={() => setShowEndDatePicker(true)}
-          />
+          >
+            <Text style={styles.buttonText}>Seleccionar Fecha de Fin</Text>
+          </Pressable>
         </>
       )}
 
-      {/* Date Picker for mobile (iOS and Android) */}
       {showStartDatePicker && Platform.OS !== "web" && (
         <DateTimePicker
           value={startDate}
@@ -113,33 +108,23 @@ const Report = () => {
         />
       )}
 
-      {/* Date Picker for web */}
       {Platform.OS === "web" && (
         <View>
-          <Text>Select Start Date</Text>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => onStartDateChange(date)}
-          />
-          <Text>Select End Date</Text>
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => onEndDateChange(date)}
-          />
+          <Text style={styles.label}>Seleccionar Fecha de Inicio</Text>
+          <DatePicker selected={startDate} onChange={onStartDateChange} />
+          <Text style={styles.label}>Seleccionar Fecha de Fin</Text>
+          <DatePicker selected={endDate} onChange={onEndDateChange} />
         </View>
       )}
 
-      {/* Display the selected date range */}
-      <Text>Selected Start Date: {startDate.toDateString()}</Text>
-      <Text>Selected End Date: {endDate.toDateString()}</Text>
-
-      {/* Display shifts */}
       {shifts.length > 0 ? (
         shifts.map((shift, index) => (
-          <Text key={index}>{shift.shiftName}</Text> // Adjust based on your shift schema
+          <Text key={index} style={styles.shiftText}>
+           Día: {shift.date} - Entrada: {shift.in} - Salida: {shift.out}
+          </Text>
         ))
       ) : (
-        <Text>No shifts found for the selected date range</Text>
+        <Text style={styles.errorText}>No se encontraron turnos para las fechas seleccionadas</Text>
       )}
     </View>
   );
@@ -147,4 +132,49 @@ const Report = () => {
 
 export default Report;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  employeeText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    marginVertical: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  shiftText: {
+    fontSize: 16,
+    marginVertical: 5,
+    textAlign: "center",
+  },
+});
