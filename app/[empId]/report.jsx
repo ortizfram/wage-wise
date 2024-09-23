@@ -239,8 +239,8 @@ const Report = () => {
               )}
               <Text style={styles.shiftText}>
                 {shift.date} -{" "}
-                <Text style={{ color: "green" }}>Entrada: {shift.in}</Text> -{" "}
-                <Text style={{ color: "red" }}>Salida: {shift.out}</Text> -{" "}
+                <Text style={{ color: "green" }}> {shift.in}</Text> -{" "}
+                <Text style={{ color: "red" }}> {shift.out}</Text> -{" "}
                 Horas: {shift.total_hours}
               </Text>
             </View>
@@ -278,8 +278,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   largeText: {
-    fontSize: 20,
+    fontSize: 30,
     marginTop: 10,
+    fontWeight:700,
     textAlign: "center",
   },
   errorText: {
