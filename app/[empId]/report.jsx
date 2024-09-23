@@ -182,7 +182,9 @@ const Report = () => {
         )}
 
         {Platform.OS !== "web" && (
-          <>
+          <View style={styles.buttonContainer}>
+            {" "}
+            {/* Centering container */}
             <Pressable
               style={styles.button}
               onPress={() => setShowStartDatePicker(true)}
@@ -195,7 +197,7 @@ const Report = () => {
             >
               <Text style={styles.buttonText}>Seleccionar Fecha de Fin</Text>
             </Pressable>
-          </>
+          </View>
         )}
 
         {showStartDatePicker && Platform.OS !== "web" && (
@@ -217,7 +219,9 @@ const Report = () => {
         )}
 
         {Platform.OS === "web" && (
-          <View>
+          <View style={styles.datePickerContainer}>
+            {" "}
+            {/* Centering for web */}
             <Text style={styles.label}>Seleccionar Fecha de Inicio</Text>
             <DatePicker selected={startDate} onChange={onStartDateChange} />
             <Text style={styles.label}>Seleccionar Fecha de Fin</Text>
@@ -240,8 +244,8 @@ const Report = () => {
               <Text style={styles.shiftText}>
                 {shift.date} -{" "}
                 <Text style={{ color: "green" }}> {shift.in}</Text> -{" "}
-                <Text style={{ color: "red" }}> {shift.out}</Text> -{" "}
-                Horas: {shift.total_hours}
+                <Text style={{ color: "red" }}> {shift.out}</Text> - Horas:{" "}
+                {shift.total_hours}
               </Text>
             </View>
           ))
@@ -261,40 +265,50 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
   },
+  buttonContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5, // Reduced vertical space
+  },
+  datePickerContainer: {
+    alignItems: 'center',
+    marginVertical: 5, // Reduced vertical space
+  },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 15, // Reduced padding
     backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 15, // Reduced margin
     textAlign: "center",
   },
   employeeText: {
     fontSize: 18,
-    marginBottom: 10,
+    marginBottom: 5, // Reduced margin
     textAlign: "center",
   },
   largeText: {
-    fontSize: 30,
-    marginTop: 10,
-    fontWeight:700,
+    fontSize: 28, // Slightly smaller size
+    marginTop: 5, // Reduced margin
+    fontWeight: "700",
     textAlign: "center",
   },
   errorText: {
     color: "red",
-    marginBottom: 10,
+    marginBottom: 5, // Reduced margin
     textAlign: "center",
   },
   editableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 5, // Reduced margin
   },
   label: {
-    fontSize: 18,
+    fontSize: 16, // Slightly smaller size
     fontWeight: "bold",
     flex: 1,
     textAlign: "left",
@@ -304,17 +318,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 4,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8, // Reduced padding
     fontSize: 16,
-    height: 40,
+    height: 35, // Slightly smaller height
     backgroundColor: "#fff",
   },
   button: {
     backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8, // Reduced padding
+    paddingHorizontal: 15, // Reduced padding
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 5, // Reduced margin
   },
   buttonText: {
     color: "#fff",
@@ -322,46 +336,47 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   shiftText: {
-    fontSize: 16,
-    marginVertical: 5,
+    fontSize: 14, // Slightly smaller size
+    marginVertical: 4, // Reduced margin
     textAlign: "center",
   },
   shiftContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 5,
+    marginVertical: 4, // Reduced margin
   },
   circle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 25, // Slightly smaller size
+    height: 25, // Slightly smaller size
+    borderRadius: 12.5, // Adjusted for new size
     backgroundColor: "#007BFF",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 8, // Reduced margin
   },
   circleText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14, // Slightly smaller size
   },
   star: {
-    width: 30,
-    height: 30,
+    width: 25, // Slightly smaller size
+    height: 25, // Slightly smaller size
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-    backgroundColor: "yellow", // Make the background yellow
-    borderRadius: 15, // This creates a circular background
+    marginRight: 8, // Reduced margin
+    backgroundColor: "yellow",
+    borderRadius: 12.5, // Adjusted for new size
     overflow: "hidden",
     position: "relative",
   },
   starText: {
-    color: "black", // Set text color to black for contrast
-    fontSize: 18,
+    color: "black",
+    fontSize: 16, // Slightly smaller size
     fontWeight: "900",
     position: "absolute",
-    top: "15%", // Adjust position for better alignment
+    top: "15%",
     left: "35%",
   },
 });
+
