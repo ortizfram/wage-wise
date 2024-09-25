@@ -29,6 +29,9 @@ const Report = () => {
   const [holidayCost, setHolidayCost] = useState(0);
   const [excedente, setExcedente] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
+  const [excedenteCost, setExcedenteCost] = useState(0);
+  const [workedTimeMinutes, setWorkedTimeMinutes] = useState(0);
+  const [excedenteMin, setExcedenteMin] = useState(0);
 
   const [bonus, setBonus] = useState(0);
   const [advance, setAdvance] = useState(0);
@@ -81,11 +84,19 @@ const Report = () => {
     }
   };
 
+  const convertExcedenteToMinutes = (excedenteString) => {
+    const [hoursPart, minutesPart] = excedenteString.split(" ");
+    const hours = parseInt(hoursPart.replace("h", ""), 10) || 0;
+    const minutes = parseInt(minutesPart.replace("m", ""), 10) || 0;
+    return hours * 60 + minutes;
+  };
+
   const calculateTotalHours = (shifts) => {
     let hours = 0;
     let minutes = 0;
     let holidayMinutes = 0;
 
+    // Sum up the total hours and minutes from the shifts
     shifts.forEach((shift) => {
       const [h, m] = shift.total_hours.split(" ");
       hours += parseInt(h.replace("h", ""));
@@ -97,20 +108,24 @@ const Report = () => {
       }
     });
 
+    // Adjust hours and minutes
     hours += Math.floor(minutes / 60);
     minutes = minutes % 60;
 
     setTotalHours(hours);
     setTotalMinutes(minutes);
 
-    const totalWorkedMinutes = hours * 60 + minutes;
+    const workedMinutes = hours * 60 + minutes;
+    setWorkedTimeMinutes(workedMinutes);
+
     const hourlyFee = employee.hourly_fee || 0;
     const travelCost = employee.travel_cost || 0;
 
-    const regularCost = (totalWorkedMinutes / 60) * hourlyFee;
+    const regularCost = (workedMinutes / 60) * hourlyFee;
     const holidayCostValue = (holidayMinutes / 60) * hourlyFee;
     setHolidayCost(holidayCostValue);
 
+    // Calculating total cost (including bonus and advance)
     const totalCostValue =
       regularCost +
       holidayCostValue +
@@ -119,9 +134,28 @@ const Report = () => {
       parseFloat(advance);
     setTotalCost(totalCostValue.toFixed(2));
 
-    const declaredHours = employee.declared_hours || 0;
-    const excedente = declaredHours ? hours - declaredHours : 0;
-    setExcedente(excedente);
+    // Handle declared hours and excedente
+    const declaredMinutes = employee.declared_hours || 0;
+    const excedenteMinutes = workedMinutes - declaredMinutes;
+
+    if (excedenteMinutes <= 0) {
+      setExcedente("0h 0m");
+      setExcedenteCost("0");
+      return; // No excedente if worked time is less than declared time
+    }
+
+    // Convert excedenteMinutes to hours and minutes
+    const excedenteHours = Math.floor(excedenteMinutes / 60);
+    const excedenteRemainingMinutes = excedenteMinutes % 60;
+    setExcedente(`${excedenteHours}h ${excedenteRemainingMinutes}m`);
+
+    setExcedenteMin(convertExcedenteToMinutes(excedente));
+
+    setExcedenteCost(
+      Math.floor(
+        excedenteMin * (employee.hourly_fee / 60) + employee.travel_cost
+      )
+    );
   };
 
   return (
@@ -146,8 +180,9 @@ const Report = () => {
               </Text>
               <Text style={styles.employeeText}>
                 Tarifa Horaria: ${employee.hourly_fee || 0} | Costo Viaje: $
-                {employee.travel_cost || 0} |{` Excedente: ${excedente}hs`} |
-                Feriados: ${holidayCost || 0}
+                {employee.travel_cost || 0} |
+                {` Excedente: ${excedente} (${excedenteMin}m)`} | Feriados: $
+                {holidayCost || 0}
               </Text>
 
               <View style={styles.editableRow}>
@@ -171,6 +206,13 @@ const Report = () => {
                   placeholder="Ingrese adelanto"
                 />
               </View>
+
+              {/* <Text style={styles.excedenteText}>
+              Excedente: {employee.declaredHours > 0 ? (workedTimeMinutes - employee.declaredHours) : 0}m
+            </Text> */}
+              <Text style={styles.excedenteText}>
+                Excedente: $ {excedenteCost}
+              </Text>
 
               <Text style={styles.largeText}>Total: ${totalCost}</Text>
             </View>
@@ -266,13 +308,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 5, // Reduced vertical space
   },
   datePickerContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 5, // Reduced vertical space
   },
   container: {
@@ -378,5 +420,10 @@ const styles = StyleSheet.create({
     top: "15%",
     left: "35%",
   },
+  excedenteText: {
+    fontSize: 16, // Smaller font size for excedente
+    color: "gray", // Optional color to differentiate
+    textAlign: "center",
+    marginTop: 10, // Add space above
+  },
 });
-
