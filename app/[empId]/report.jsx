@@ -123,7 +123,7 @@ const Report = () => {
 
     const regularCost = (workedMinutes / 60) * hourlyFee;
     const holidayCostValue = (holidayMinutes / 60) * hourlyFee;
-    setHolidayCost(holidayCostValue);
+    setHolidayCost(Math.floor(holidayCostValue));
 
     // Calculating total cost (including bonus and advance)
     const totalCostValue =
