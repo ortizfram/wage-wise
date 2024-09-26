@@ -10,9 +10,10 @@ const InOutClock = ({ orgId }) => {
   const { userInfo } = useContext(AuthContext);
   const [org, setOrg] = useState(null);
   const [isEgresoVisible, setIsEgresoVisible] = useState(false);
-  const [isIngresoVisible, setIsIngresoVisible] = useState(true);
-  const [inTime, setInTime] = useState(null); // Track the in-time
-  const [outTime, setOutTime] = useState(null); // Track the out-time
+  const [isIngresoVisible, setIsIngresoVisible]= useState(true);
+  const [isIngresoFeriadoVisible, setIsIngresoFeriadoVisible] = useState(true); // State for holiday button
+  const [inTime, setInTime] = useState(null);
+  const [outTime, setOutTime] = useState(null);
 
   const fetchOrg = async () => {
     try {
@@ -42,14 +43,14 @@ const InOutClock = ({ orgId }) => {
 
   const handleIngresoPress = async () => {
     const now = new Date();
-    const currentInTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone }); // Convert current time to ART
+    const currentInTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone });
     setInTime(currentInTime);
 
     try {
       const response = await axios.post(
-        `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
+        `${RESP_URL}/api/shift/${userInfo.user._id}/${org._id}`,
         {
-          inTime: currentInTime, // Send the in-time as ISO string
+          inTime: currentInTime,
           shiftMode: "regular",
         },
         {
@@ -63,6 +64,7 @@ const InOutClock = ({ orgId }) => {
       if (response.status === 201) {
         setIsEgresoVisible(true);
         setIsIngresoVisible(false);
+        setIsIngresoFeriadoVisible(false); // Hide holiday button after regular clock in
       } else {
         console.log("Failed to create shift");
         Alert.alert("Error", "Failed to clock in. Please try again.");
@@ -76,18 +78,53 @@ const InOutClock = ({ orgId }) => {
     }
   };
 
+  const handleIngresoFeriadoPress = async () => {
+    const now = new Date();
+    const currentInTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone });
+    setInTime(currentInTime);
+
+    try {
+      const response = await axios.post(
+        `${RESP_URL}/api/shift/${userInfo.user._id}/${org._id}`,
+        {
+          inTime: currentInTime,
+          shiftMode: "holiday",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setIsEgresoVisible(true);
+        setIsIngresoVisible(false);
+        setIsIngresoFeriadoVisible(false); // Hide holiday button after holiday clock in
+      } else {
+        console.log("Failed to create holiday shift");
+        Alert.alert("Error", "Failed to clock in (holiday). Please try again.");
+      }
+    } catch (error) {
+      console.log("Error during handleIngresoFeriadoPress:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred during holiday clock in. Please try again."
+      );
+    }
+  };
+
   const handleEgresoPress = async () => {
     const now = new Date();
-    const currentOutTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", {
-      timeZone,
-    }); // Convert current time to ART
+    const currentOutTime = format(now, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone });
     setOutTime(currentOutTime);
 
     try {
       const response = await axios.put(
-        `${RESP_URL}/api/shift/${userInfo._id}/${org._id}`,
+        `${RESP_URL}/api/shift/${userInfo.user._id}/${org._id}`,
         {
-          outTime: currentOutTime, // Send the out-time as ISO string
+          outTime: currentOutTime,
         },
         {
           headers: {
@@ -100,8 +137,9 @@ const InOutClock = ({ orgId }) => {
       if (response.status === 200) {
         setIsEgresoVisible(false);
         setIsIngresoVisible(true);
-        setInTime(null); // Reset in-time
-        setOutTime(null); // Reset out-time
+        setIsIngresoFeriadoVisible(true); // Show holiday button again after clocking out
+        setInTime(null);
+        setOutTime(null);
       } else {
         console.log("Failed to complete shift");
         Alert.alert("Error", "Failed to clock out. Please try again.");
@@ -137,6 +175,11 @@ const InOutClock = ({ orgId }) => {
       {isIngresoVisible && (
         <Pressable style={styles.actionBtn} onPress={handleIngresoPress}>
           <Text style={styles.actionText}>Ingreso</Text>
+        </Pressable>
+      )}
+      {isIngresoFeriadoVisible && (
+        <Pressable style={styles.actionBtn} onPress={handleIngresoFeriadoPress}>
+          <Text style={styles.actionText}>Ingreso Feriado</Text>
         </Pressable>
       )}
       {isEgresoVisible && (
