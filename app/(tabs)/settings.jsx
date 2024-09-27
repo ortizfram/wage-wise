@@ -1,9 +1,6 @@
 import React, { useContext } from "react";
-import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
-import axios from "axios";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RESP_URL } from "../../config";
 import { AuthContext } from "../../context/AuthContext";
 import Spinnerr from "react-native-loading-spinner-overlay";
 
@@ -17,6 +14,12 @@ const Settings = () => {
       <Text style={styles.header}>Configuraciones</Text>
       <Text style={styles.account}>{userInfo ? userInfo.email : ""}</Text>
 
+      <Pressable
+        onPress={() => router.push(`${userInfo?.user?._id}/profile`)}
+        style={styles.logoutButton}
+      >
+        <Text style={styles.linkText}>Mi Perfil</Text>
+      </Pressable>
       <Pressable onPress={logout} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Salir de esta cuenta</Text>
       </Pressable>
@@ -45,7 +48,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 18,
   },
-  
+  linkText: {
+    color: "blue",
+    fontSize: 15,
+  },
 });
 
 export default Settings;

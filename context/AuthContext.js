@@ -12,6 +12,13 @@ export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState({});
   const router = useRouter();
 
+  const updateUserInfo = (updatedUser) => {
+    setUserInfo((prevState) => ({
+      ...prevState,
+      user: updatedUser,
+    }));
+  };
+
   const register = async (email, password) => {
     console.log("Handling signup");
     setIsLoading(true);
@@ -68,7 +75,7 @@ export const AuthProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-  
+
       if (res.status === 200) {
         console.log("Response received, setting token");
         let userInfo = res.data;
@@ -81,11 +88,12 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       setIsLoading(false);
       let errorMessage = "An unexpected error occurred";
-  
+
       if (axios.isAxiosError(error)) {
         if (error.response) {
           if (error.response.status === 401) {
-            errorMessage = "Invalid credentials. Please check your email and password.";
+            errorMessage =
+              "Invalid credentials. Please check your email and password.";
           } else {
             errorMessage = error.response.data.message || errorMessage;
           }
@@ -93,7 +101,7 @@ export const AuthProvider = ({ children }) => {
           errorMessage = "No response from the server. Please try again later.";
         }
       }
-  
+
       alert(errorMessage); // Display the error message as an alert
       console.log(`login error: ${error}`);
     }
@@ -148,13 +156,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     isLoggedIn();
-  },[])
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ register, login, logout, isLoading, userInfo, splashLoading }}
+      value={{
+        register,
+        updateUserInfo,
+        login,
+        logout,
+        isLoading,
+        userInfo,
+        splashLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
