@@ -8,15 +8,14 @@ import {
   Alert,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/AuthContext"; // Make sure AuthContext is imported
+import { AuthContext } from "../../context/AuthContext";
 import { RESP_URL } from "../../config";
 import axios from "axios";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Profile = () => {
-  // Extract both userInfo and updateUserInfo from AuthContext
   const { userInfo, updateUserInfo } = useContext(AuthContext);
-  const [editable, setEditable] = useState(false); // Toggle between edit and view mode
+  const [editable, setEditable] = useState(false);
   const [updatedData, setUpdatedData] = useState({
     email: userInfo?.user?.email || "",
     firstname: userInfo?.user?.firstname || "",
@@ -25,7 +24,7 @@ const Profile = () => {
 
   useEffect(() => {
     console.log("userInfo.user: ", userInfo.user);
-  });
+  }, []);
 
   const toggleEdit = () => setEditable(!editable);
 
@@ -34,22 +33,37 @@ const Profile = () => {
 
   const saveProfile = async () => {
     try {
-      const response = await axios.put(
-        `${RESP_URL}/api/users/${userInfo?.user?._id}/update`,
-        updatedData,
-        { headers: { Authorization: `Bearer ${userInfo?.token}` } }
-      );
+      const updatedFields = {};
+      if (updatedData.email !== userInfo?.user?.email) {
+        updatedFields.email = updatedData.email;
+      }
+      if (updatedData.firstname !== userInfo?.user?.firstname) {
+        updatedFields.firstname = updatedData.firstname;
+      }
+      if (updatedData.lastname !== userInfo?.user?.lastname) {
+        updatedFields.lastname = updatedData.lastname;
+      }
 
-      if (response.status === 200) {
-        console.log("Profile updated:", response.data);
+      if (Object.keys(updatedFields).length > 0) {
+        const response = await axios.put(
+          `${RESP_URL}/api/users/${userInfo?.user?._id}/update`,
+          updatedFields,
+          { headers: { Authorization: `Bearer ${userInfo?.token}` } }
+        );
 
-        // Update AuthContext with new data (merge updated fields)
-        updateUserInfo({
-          ...userInfo.user, // Keep existing fields
-          ...response.data, // Overwrite with updated fields
-        });
+        if (response.status === 200) {
+          console.log("Profile updated:", response.data);
 
-        setEditable(false); // Disable edit mode after saving
+          updateUserInfo({
+            ...userInfo.user,
+            ...updatedFields,
+          });
+
+          setEditable(false);
+        }
+      } else {
+        console.log("No changes to update");
+        setEditable(false);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -106,7 +120,7 @@ const Profile = () => {
           onChangeText={(text) => handleInputChange("firstname", text)}
         />
       ) : (
-        <Text style={styles.text}>{userInfo?.user?.data?.firstname || "N/A"}</Text>
+        <Text style={styles.text}>{userInfo?.user?.firstname || "N/A"}</Text>
       )}
 
       <View style={styles.editRow}>
@@ -122,7 +136,7 @@ const Profile = () => {
           onChangeText={(text) => handleInputChange("lastname", text)}
         />
       ) : (
-        <Text style={styles.text}>{userInfo?.user?.data?.lastname || "N/A"}</Text>
+        <Text style={styles.text}>{userInfo?.user?.lastname || "N/A"}</Text>
       )}
 
       {editable && (

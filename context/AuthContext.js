@@ -13,15 +13,20 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   const updateUserInfo = (updatedUser) => {
-    setUserInfo((prevState) => ({
-      ...prevState,
+    const updatedUserInfo = {
+      ...userInfo, // Mantener los campos existentes
       user: {
-        ...prevState.user, // Preserve other fields in userInfo.user
-        ...updatedUser,    // Merge updated fields from the response
+        ...userInfo.user, // Mantener los campos del objeto `user`
+        ...updatedUser, // Sobrescribir con los nuevos datos del usuario
       },
-    }));
+    };
+
+    // Actualizar el estado con los nuevos datos
+    setUserInfo(updatedUserInfo);
+
+    // Guardar el nuevo userInfo en AsyncStorage
+    AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
   };
-  
 
   const register = async (email, password) => {
     console.log("Handling signup");
