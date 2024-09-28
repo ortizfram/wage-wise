@@ -57,8 +57,8 @@ export default function OrganizationList() {
     <View style={styles.container}>
       <Text style={styles.welcome}>
         Bienvenido {userInfo?.user?.isAdmin && <Text>Admin</Text>}{" "}
-        {userInfo?.user?.firstname
-          ? userInfo?.user?.firstname
+        {userInfo?.user?.data?.firstname
+          ? userInfo?.user?.data?.firstname
           : userInfo?.user?.email || ""}
       </Text>
       {userInfo?.user?.isAdmin ? (

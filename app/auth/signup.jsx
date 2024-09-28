@@ -14,42 +14,57 @@ import Spinner from "react-native-loading-spinner-overlay";
 const Signup = () => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [firstname, setFirstname] = useState(null);
+  const [lastname, setLastname] = useState(null);
 
-  const {register, isLoading} = useContext(AuthContext);
+  const { register, isLoading } = useContext(AuthContext);
   const router = useRouter();
 
   return (
     <View style={styles.container}>
+      <Text style={styles.appname}>WAGE WISE</Text>
+      <Text style={styles.header}>Registro</Text>
       <Spinner visible={isLoading} />
-      <View style={styles.wrapper}>
-        <TextInput
-          style={styles.input}
-          value={email}
-          placeholder="Enter email"
-          onChangeText={(text) => setEmail(text)}
-        />
-
-        <TextInput
-          style={styles.input}
-          value={password}
-          placeholder="Enter password"
-          onChangeText={(text) => setPassword(text)}
-          secureTextEntry
-        />
-
-        <Button
-          title="Register"
-          onPress={() => {
-            register(email, password);
-          }}
-        />
-
-        <View style={{ flexDirection: "row", marginTop: 20 }}>
-          <Text>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/auth/login")}>
-            <Text style={styles.link}>Login</Text>
-          </TouchableOpacity>
-        </View>
+      <TextInput
+        style={styles.input}
+        value={email}
+        placeholder="Ingresa Email"
+        onChangeText={(text) => setEmail(text)}
+        inputMode="email"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        value={password}
+        placeholder="Ingresa Contraseña"
+        onChangeText={(text) => setPassword(text)}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={firstname}
+        onChangeText={(text) => setFirstname(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Apellido"
+        value={lastname}
+        onChangeText={(text) => setLastname(text)}
+      />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          register(email, password, firstname, lastname);
+        }}
+      >
+        <Text style={styles.textButton}>Registro</Text>
+      </TouchableOpacity>
+      <View style={styles.linkContainer}>
+        <Text>Ya tienes cuenta? </Text>
+        <TouchableOpacity onPress={() => router.push("/auth/login")}>
+          <Text style={styles.link}>Ingresar</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -58,18 +73,41 @@ const Signup = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
   },
-  wrapper: {
-    width: "80%",
+  header: {
+    fontSize: 24,
+    marginBottom: 24,
+  },
+  appname: {
+    fontSize: 30,
+    marginBottom: 15,
   },
   input: {
-    marginBottom: 12,
+    width: "100%",
+    padding: 10,
+    marginVertical: 10,
     borderWidth: 1,
-    borderColor: "#bbb",
+    borderColor: "#ccc",
     borderRadius: 5,
-    paddingHorizontal: 14,
+  },
+  button: {
+    width: "100%",
+    padding: 15,
+    backgroundColor: "blue",
+    alignItems: "center",
+    marginTop: 10,
+    borderRadius: 5,
+  },
+  textButton: {
+    color: "#e3e3e3",
+    fontSize: 16,
+  },
+  linkContainer: {
+    flexDirection: "row",
+    marginTop: 20,
   },
   link: {
     color: "blue",

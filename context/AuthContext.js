@@ -28,13 +28,13 @@ export const AuthProvider = ({ children }) => {
     AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
   };
 
-  const register = async (email, password) => {
+  const register = async (email, password, firstname,lastname) => {
     console.log("Handling signup");
     setIsLoading(true);
     try {
       const res = await axios.post(
         `${RESP_URL}/api/users/register`,
-        { email, password },
+        { email, password, firstname, lastname },
         { withCredentials: true }
       );
 

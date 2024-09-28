@@ -28,8 +28,8 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.appname}>WAGE WISE</Text>
-      <Text style={styles.header}>Login</Text>
+      <Text style={styles.appname}>HORAS PLUS</Text>
+      <Text style={styles.header}>Ingreso</Text>
       <Spinner visible={isLoading} />
       <TextInput
         style={styles.input}
@@ -41,7 +41,7 @@ const Login = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -50,20 +50,20 @@ const Login = () => {
       {/* Display error if exists */}
       
       <Pressable onPress={handleLogin} style={styles.button}>
-        <Text style={styles.textButton}>Login</Text>
+        <Text style={styles.textButton}>Ingresar</Text>
       </Pressable>
       
       <Pressable onPress={loginWithGoogle} style={[styles.button, styles.googleButton]}>
-        <Text style={styles.textButton}>Login with Google</Text>
+        <Text style={styles.textButton}>Ingresar con Google</Text>
       </Pressable>
       
       <Pressable onPress={loginWithFacebook} style={[styles.button, styles.facebookButton]}>
-        <Text style={styles.textButton}>Login with Facebook</Text>
+        <Text style={styles.textButton}>Ingresar con Facebook</Text>
       </Pressable>
 
       <Pressable style={styles.link}>
         <Link href="/auth/signup">
-          <Text style={{ color: "blue" }}>I don't have an account yet</Text>
+          <Text style={{ color: "blue" }}>No tengo una cuenta aun!</Text>
         </Link>
       </Pressable>
     </View>
