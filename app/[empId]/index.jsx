@@ -1,16 +1,36 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { fetchEmployeeWithId } from "../../services/organization/fetchEmployees";
 
 const Index = () => {
   const { empId } = useLocalSearchParams();
+  const [employee, setEmployee] = useState({});
+
   const router = useRouter();
+
+  useEffect(() => {
+    const loadEmployee = async () => {
+      try {
+        const data = await fetchEmployeeWithId(empId);
+        setEmployee(data);
+      } catch (error) {
+        console.error("Error fetching employee:", error);
+      }
+    };
+    loadEmployee();
+  }, [empId]);
 
   return (
     <View style={styles.container}>
       <View style={styles.gridContainer}>
-        <Text style={styles.title}>Nombre Apellido</Text>
-        <Text style={styles.subtitle}>ID: {empId}</Text>
+        <Text style={styles.title}>
+          {employee?.firstname
+            ? `${employee.firstname} ${employee.lastname}`
+            : employee.email}
+        </Text>
+        
+        <Text style={styles.subtitle}> ID: {empId}</Text>
 
         <Pressable
           style={styles.gridItem}
@@ -30,7 +50,7 @@ const Index = () => {
           style={styles.gridItem}
           onPress={() => router.push(`${empId}/report`)}
         >
-          <Text style={styles.gridText}>Reporte de Horas</Text>
+          <Text style={styles.gridText}>🕒 Reporte de Horas</Text>
         </Pressable>
       </View>
     </View>

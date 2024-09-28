@@ -1,5 +1,11 @@
 import React, { useContext, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import SearchOrganization from "../../components/searchOrganization";
@@ -12,33 +18,36 @@ export default function OrganizationList() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log(userInfo)
+    console.log(userInfo);
     if (!userInfo) {
       router.push("/auth/login");
     }
   }, [userInfo]);
 
   const handleSelectOrg = async (orgId) => {
-      /** go dashboard if i'm part of the organization,also if i'm org Admin. else Join **/
-      try {
-        const response = await axios.get(`${RESP_URL}/api/organization/${orgId}`, {
+    /** go dashboard if i'm part of the organization,also if i'm org Admin. else Join **/
+    try {
+      const response = await axios.get(
+        `${RESP_URL}/api/organization/${orgId}`,
+        {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,
-        });
-  
-        const organization = response.data;
-        if (organization.user_id === userInfo?.user?._id) {
-          router.push(`/${orgId}/dashboard`);
-        } else {
-          router.push(`/${orgId}/bePart`);
         }
-      } catch (error) {
-        console.error("Failed to fetch organization details:", error);
+      );
+
+      const organization = response.data;
+      if (organization.user_id === userInfo?.user?._id) {
+        router.push(`/${orgId}/dashboard`);
+      } else {
+        router.push(`/${orgId}/bePart`);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch organization details:", error);
+    }
+  };
 
   if (authLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -46,7 +55,12 @@ export default function OrganizationList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Bienvenido {userInfo?.user?.isAdmin && <Text>Admin</Text>} {userInfo?.user?.email || ""}</Text>
+      <Text style={styles.welcome}>
+        Bienvenido {userInfo?.user?.isAdmin && <Text>Admin</Text>}{" "}
+        {userInfo?.user?.firstname
+          ? userInfo?.user?.firstname
+          : userInfo?.user?.email || ""}
+      </Text>
       {userInfo?.user?.isAdmin ? (
         <>
           <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
@@ -67,7 +81,7 @@ export default function OrganizationList() {
           />
         </>
       ) : userInfo?.user?.data?.organization_id ? (
-        <InOutClock orgId={userInfo?.user?.data?.organization_id}/>
+        <InOutClock orgId={userInfo?.user?.data?.organization_id} />
       ) : (
         <>
           <Text style={styles.blue}>

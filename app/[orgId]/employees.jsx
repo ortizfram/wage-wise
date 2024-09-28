@@ -43,17 +43,23 @@ const Employees = () => {
     router.push(`${empId}`);
   };
 
-  const renderEmployee = ({ item }) => (
-    <TouchableOpacity
-      style={styles.employeeContainer}
-      onPress={() => handlePress(item._id)}
-    >
-      <Text>
-        {item.firstname} {item.lastname}
-      </Text>
-      <Text>{item.email}</Text>
-    </TouchableOpacity>
-  );
+  const renderEmployee = ({ item }) => {
+    console.log("Employee item:", item); // Log the item to see its structure
+
+    const displayName =
+      item.firstname && item.lastname
+        ? `${item.firstname} ${item.lastname}`
+        : item.email; // Fallback to email if names are not available
+
+    return (
+      <TouchableOpacity
+        style={styles.employeeContainer}
+        onPress={() => handlePress(item._id)}
+      >
+        <Text>{displayName}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
