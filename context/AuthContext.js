@@ -15,9 +15,13 @@ export const AuthProvider = ({ children }) => {
   const updateUserInfo = (updatedUser) => {
     setUserInfo((prevState) => ({
       ...prevState,
-      user: updatedUser,
+      user: {
+        ...prevState.user, // Preserve other fields in userInfo.user
+        ...updatedUser,    // Merge updated fields from the response
+      },
     }));
   };
+  
 
   const register = async (email, password) => {
     console.log("Handling signup");
