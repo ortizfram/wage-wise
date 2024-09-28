@@ -22,13 +22,13 @@ const Signup = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.appname}>WAGE WISE</Text>
+      <Text style={styles.appname}>HORAS PLUS</Text>
       <Text style={styles.header}>Registro</Text>
       <Spinner visible={isLoading} />
       <TextInput
         style={styles.input}
         value={email}
-        placeholder="Ingresa Email"
+        placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         inputMode="email"
         autoCapitalize="none"
@@ -36,7 +36,7 @@ const Signup = () => {
       <TextInput
         style={styles.input}
         value={password}
-        placeholder="Ingresa Contraseña"
+        placeholder="Contraseña"
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
       />
