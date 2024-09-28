@@ -170,10 +170,9 @@ const Report = () => {
                 {employee.firstname} {employee.lastname}
               </Text>
             ) : (
-              <View></View>
+              <Text style={styles.employeeText}>{employee.email}</Text>
             )}
 
-            <Text style={styles.employeeText}>{employee.email}</Text>
             <View>
               <Text style={styles.title}>
                 Horas Totales: {totalHours}h {totalMinutes}m
