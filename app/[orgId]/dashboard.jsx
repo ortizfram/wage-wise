@@ -108,12 +108,9 @@ export default function Dashboard() {
           <Icon name="group" size={30} color="#007bff" />
           <Text style={styles.gridText}>Roles</Text>
         </Pressable>
-        <Pressable
-          style={styles.gridItem}
-          onPress={() => router.push("/alerts")}
-        >
-          <Icon name="notifications" size={30} color="#007bff" />
-          <Text style={styles.gridText}>Alertas</Text>
+        <Pressable style={styles.gridItem} onPress={() => router.push("/qr")}>
+          <Icon name="qr-code" size={30} color="#007bff" />
+          <Text style={styles.gridText}>Generar QR del establecimiento</Text>
         </Pressable>
         <Pressable
           style={styles.gridItem}
