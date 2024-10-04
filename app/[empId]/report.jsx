@@ -95,68 +95,72 @@ const Report = () => {
     let hours = 0;
     let minutes = 0;
     let holidayMinutes = 0;
-
+  
     // Sum up the total hours and minutes from the shifts
     shifts.forEach((shift) => {
       const [h, m] = shift.total_hours.split(" ");
       hours += parseInt(h.replace("h", ""));
       minutes += parseInt(m.replace("m", ""));
-
+  
       if (shift.shift_mode === "holiday") {
         holidayMinutes +=
           parseInt(h.replace("h", "")) * 60 + parseInt(m.replace("m", ""));
       }
     });
-
+  
     // Adjust hours and minutes
     hours += Math.floor(minutes / 60);
     minutes = minutes % 60;
-
+  
     setTotalHours(hours);
     setTotalMinutes(minutes);
-
+  
     const workedMinutes = hours * 60 + minutes;
     setWorkedTimeMinutes(workedMinutes);
-
+  
     const hourlyFee = employee.hourly_fee || 0;
     const travelCost = employee.travel_cost || 0;
-
+    const bonusPrize = employee.bonus_prize || 0; // Add bonus_prize
+  
     const regularCost = (workedMinutes / 60) * hourlyFee;
     const holidayCostValue = (holidayMinutes / 60) * hourlyFee;
     setHolidayCost(Math.floor(holidayCostValue));
-
-    // Calculating total cost (including bonus and advance)
+  
+    // Calculating total cost (including bonus, advance, and bonus_prize)
     const totalCostValue =
       regularCost +
       holidayCostValue +
       travelCost +
-      parseFloat(bonus) -
+      parseFloat(bonus) +
+      parseFloat(bonusPrize) - // Include bonus_prize in total
       parseFloat(advance);
+  
     setTotalCost(totalCostValue.toFixed(2));
-
+  
     // Handle declared hours and excedente
     const declaredMinutes = employee.declared_hours || 0;
     const excedenteMinutes = workedMinutes - declaredMinutes;
-
+  
     if (excedenteMinutes <= 0) {
       setExcedente("0h 0m");
       setExcedenteCost("0");
       return; // No excedente if worked time is less than declared time
     }
-
+  
     // Convert excedenteMinutes to hours and minutes
     const excedenteHours = Math.floor(excedenteMinutes / 60);
     const excedenteRemainingMinutes = excedenteMinutes % 60;
     setExcedente(`${excedenteHours}h ${excedenteRemainingMinutes}m`);
-
+  
     setExcedenteMin(convertExcedenteToMinutes(excedente));
-
+  
     setExcedenteCost(
       Math.floor(
         excedenteMin * (employee.hourly_fee / 60) + employee.travel_cost
       )
     );
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -179,24 +183,13 @@ const Report = () => {
               </Text>
               <Text style={styles.employeeText}>
                 Tarifa Horaria: ${employee.hourly_fee || 0} | Costo Viaje: $
-                {employee.travel_cost || 0} |
+                {employee.travel_cost || 0} | Premio: ${employee.bonus_prize || 0} |
                 {` Excedente: ${excedente} (${excedenteMin}m)`} | Feriados: $
                 {holidayCost || 0}
               </Text>
 
               <View style={styles.editableRow}>
-                <Text style={styles.label}>Premio:</Text>
-                <TextInput
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={String(bonus)}
-                  onChangeText={setBonus}
-                  placeholder="Ingrese premio"
-                />
-              </View>
-
-              <View style={styles.editableRow}>
-                <Text style={styles.label}>Adelanto:</Text>
+                <Text style={styles.label}>Restar Adelanto:</Text>
                 <TextInput
                   style={styles.input}
                   keyboardType="numeric"
