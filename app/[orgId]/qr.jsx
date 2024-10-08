@@ -1,14 +1,36 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
+import { useLocalSearchParams } from 'expo-router';
 
-const qr = () => {
+const Qr = () => {
+  const { orgId } = useLocalSearchParams(); // Get the orgId from params
+
   return (
-    <View>
-      <Text>qr</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>QR Code for Organization</Text>
+      {orgId && (
+        <QRCode
+          value={orgId} // Generate QR code based on orgId
+          size={200}
+        />
+      )}
+      <Text>{orgId}</Text>
     </View>
-  )
-}
+  );
+};
 
-export default qr
+export default Qr;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+});

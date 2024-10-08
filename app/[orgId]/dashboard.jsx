@@ -108,7 +108,7 @@ export default function Dashboard() {
           <Icon name="group" size={30} color="#007bff" />
           <Text style={styles.gridText}>Roles</Text>
         </Pressable>
-        <Pressable style={styles.gridItem} onPress={() => router.push("/qr")}>
+        <Pressable style={styles.gridItem} onPress={() => router.push(`${orgId}/qr`)}>
           <Icon name="qr-code" size={30} color="#007bff" />
           <Text style={styles.gridText}>Generar QR del establecimiento</Text>
         </Pressable>
