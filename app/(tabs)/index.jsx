@@ -13,21 +13,25 @@ import InOutClock from "../../components/InOutClock";
 import QRCodeScanner from "../../utils/QRCodeScanner"; // Import QRCodeScanner
 import { RESP_URL } from "../../config";
 import axios from "axios";
+import { useCameraPermissions } from "expo-camera";
 
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
   const [showScanner, setShowScanner] = useState(false); // New state for QR code scanner
+  const [permission, requestPermission] = useCameraPermissions(); // Camera permission state
+
+  // Check if camera permission is granted
+  const isPermissionGranted = permission ? true : false;
 
   useEffect(() => {
-    console.log(userInfo);
     if (!userInfo) {
       router.push("/auth/login");
     }
   }, [userInfo]);
 
   const handleSelectOrg = async (orgId) => {
-    /** go dashboard if i'm part of the organization,also if i'm org Admin. else Join **/
+    /** go dashboard if I'm part of the organization, also if I'm org Admin. else Join **/
     try {
       const response = await axios.get(
         `${RESP_URL}/api/organization/${orgId}`,
@@ -94,11 +98,23 @@ export default function OrganizationList() {
           <Text style={styles.blue}>
             Por favor, escanea el QR del establecimiento para formar parte
           </Text>
+          <Pressable onPress={requestPermission}>
+            <Text style={styles.textButton}>Permitir</Text>
+          </Pressable>
           <Pressable
-            style={styles.button}
-            onPress={() => setShowScanner(true)} // Set scanner to true
+            disabled={!isPermissionGranted}
+            onPress={() =>
+              router.push(`/scanner?userId=${userInfo?.user?._id}`)
+            }
           >
-            <Text style={styles.textButton}>Scanear</Text>
+            <Text
+              style={[
+                styles.textButton,
+                { opacity: isPermissionGranted ? 1 : 0.5 }, // Adjust opacity
+              ]}
+            >
+              Scanear Código
+            </Text>
           </Pressable>
         </>
       )}
@@ -113,14 +129,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   blue: {
-    color: "blue",
+    color: "gray",
     marginBottom: 10,
   },
-  textButton: { color: "white" },
-  button: { padding: 5, backgroundColor: "blue" },
+  textButton: { color: "blue", paddingTop: 10, gap:20 },
+  button: {
+    padding: 10,
+    backgroundColor: "lightgray",
+    marginVertical: 10,
+    borderRadius: 5,
+  },
   welcome: {
     marginTop: 15,
-    color: "blue",
+    color: "gray",
     fontSize: 20,
   },
   createBtn: {
