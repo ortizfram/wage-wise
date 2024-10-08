@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,14 @@ import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import SearchOrganization from "../../components/searchOrganization";
 import InOutClock from "../../components/InOutClock";
+import QRCodeScanner from "../../utils/QRCodeScanner"; // Import QRCodeScanner
 import { RESP_URL } from "../../config";
 import axios from "axios";
 
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
+  const [showScanner, setShowScanner] = useState(false); // New state for QR code scanner
 
   useEffect(() => {
     console.log(userInfo);
@@ -53,6 +55,11 @@ export default function OrganizationList() {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
+  if (showScanner) {
+    // If scanner is enabled, show the QRCodeScanner component
+    return <QRCodeScanner userId={userInfo?.user?._id} />;
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>
@@ -85,13 +92,14 @@ export default function OrganizationList() {
       ) : (
         <>
           <Text style={styles.blue}>
-            Envia la solicitud para ser parte de una organización
+            Por favor, escanea el QR del establecimiento para formar parte
           </Text>
-          <SearchOrganization
-            userId={userInfo._id}
-            token={userInfo.token}
-            onSelectOrg={handleSelectOrg}
-          />
+          <Pressable
+            style={styles.button}
+            onPress={() => setShowScanner(true)} // Set scanner to true
+          >
+            <Text style={styles.textButton}>Scanear</Text>
+          </Pressable>
         </>
       )}
     </View>
@@ -108,6 +116,8 @@ const styles = StyleSheet.create({
     color: "blue",
     marginBottom: 10,
   },
+  textButton: { color: "white" },
+  button: { padding: 5, backgroundColor: "blue" },
   welcome: {
     marginTop: 15,
     color: "blue",
