@@ -1,30 +1,41 @@
-// QRCodeScanner.jsx
-
 import React, { useState, useEffect } from "react";
-import { Text, View, Button, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { Camera } from "expo-camera";
-import { useRouter } from "expo-router";
+import axios from "axios";
+import { RESP_URL } from "../config";
 
-const QRCodeScanner = ({ userId }) => {
+export default function QRCodeScanner({ userId }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
+  // Request camera permission when the component mounts
   useEffect(() => {
-    const getCameraPermissions = async () => {
+    (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
-    };
+    })();
+    console.log("hasPermission ", hasPermission);
+  }, [hasPermission]);
 
-    getCameraPermissions();
-  }, []);
+  // This function handles the QR code scan
+  const handleBarCodeScanned = async ({ data }) => {
+    setScanned(true);
+    setLoading(true);
+    const oid = data; // Assuming the QR code contains just the `oid`
 
-  const handleBarCodeScanned = ({ barcodes }) => {
-    if (!scanned && barcodes.length > 0) {  // Ensure there's data
-      setScanned(true);
-      const data = barcodes[0].data;
-      console.log(`QR code scanned: ${data}`);
-      router.push(`/${data}/bePart`);
+    try {
+      // Send request to backend to associate user with organization
+      await axios.post(`${RESP_URL}/api/organization/${oid}/bePart`, {
+        uid: userId,
+      });
+
+      alert("You have successfully joined the organization");
+    } catch (error) {
+      console.error("Error joining organization:", error);
+      alert("Failed to join organization");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,28 +47,19 @@ const QRCodeScanner = ({ userId }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Camera
-        ref={(ref) => setCameraRef(ref)}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barCodeScannerSettings={{
-          barCodeTypes: ["qr"],
-        }}
-        style={StyleSheet.absoluteFillObject}
-      />
-      {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+    <View style={{ flex: 1 }}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Camera
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={{ flex: 1 }}
+          barCodeScannerSettings={{
+            barCodeTypes: [Camera.Constants.BarCodeType.qr], // To limit to QR codes
+          }}
+        />
       )}
+      {scanned && <Text>Scan again to join another organization</Text>}
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
-
-export default QRCodeScanner;
+}

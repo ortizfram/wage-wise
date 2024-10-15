@@ -10,7 +10,7 @@ import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
 import SearchOrganization from "../../components/searchOrganization";
 import InOutClock from "../../components/InOutClock";
-import QRCodeScanner from "../../utils/QRCodeScanner"; // Import QRCodeScanner
+import QRCodeScanner from "../../utils/QRCodeScanner";
 import { RESP_URL } from "../../config";
 import axios from "axios";
 import { useCameraPermissions } from "expo-camera";
@@ -18,20 +18,43 @@ import { useCameraPermissions } from "expo-camera";
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
-  const [showScanner, setShowScanner] = useState(false); // New state for QR code scanner
-  const [permission, requestPermission] = useCameraPermissions(); // Camera permission state
-
-  // Check if camera permission is granted
-  const isPermissionGranted = permission ? true : false;
+  const [showScanner, setShowScanner] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
     if (!userInfo) {
       router.push("/auth/login");
     }
-  }, [userInfo]);
+    console.log("permission orgList", permission);
+  }, [userInfo, permission]);
+
+  if (!permission || !permission.granted) {
+    return (
+      <View
+        style={{
+          textAlign: "center",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingTop: 200,
+        }}
+      >
+        <Text style={styles.welcome}>
+          Bienvenido {userInfo?.user?.isAdmin && <Text>Admin</Text>}{" "}
+          {userInfo?.user?.data?.firstname
+            ? userInfo?.user?.data?.firstname
+            : userInfo?.user?.email || ""}
+        </Text>
+        <Text>Acceso a camara es requerido para escanear Codigo QR.</Text>
+        <Pressable onPress={requestPermission}>
+          <Text style={{ color: "blue", textAlign: "center" }}>Permitir</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const isPermissionGranted = permission.granted;
 
   const handleSelectOrg = async (orgId) => {
-    /** go dashboard if I'm part of the organization, also if I'm org Admin. else Join **/
     try {
       const response = await axios.get(
         `${RESP_URL}/api/organization/${orgId}`,
@@ -43,7 +66,6 @@ export default function OrganizationList() {
           withCredentials: true,
         }
       );
-
       const organization = response.data;
       if (organization.user_id === userInfo?.user?._id) {
         router.push(`/${orgId}/dashboard`);
@@ -60,7 +82,6 @@ export default function OrganizationList() {
   }
 
   if (showScanner) {
-    // If scanner is enabled, show the QRCodeScanner component
     return <QRCodeScanner userId={userInfo?.user?._id} />;
   }
 
@@ -98,9 +119,7 @@ export default function OrganizationList() {
           <Text style={styles.blue}>
             Por favor, escanea el QR del establecimiento para formar parte
           </Text>
-          <Pressable onPress={requestPermission}>
-            <Text style={styles.textButton}>Permitir</Text>
-          </Pressable>
+          
           <Pressable
             disabled={!isPermissionGranted}
             onPress={() =>
@@ -110,7 +129,7 @@ export default function OrganizationList() {
             <Text
               style={[
                 styles.textButton,
-                { opacity: isPermissionGranted ? 1 : 0.5 }, // Adjust opacity
+                { opacity: isPermissionGranted ? 1 : 0.5 },
               ]}
             >
               Scanear Código
@@ -132,7 +151,7 @@ const styles = StyleSheet.create({
     color: "gray",
     marginBottom: 10,
   },
-  textButton: { color: "blue", paddingTop: 10, gap:20 },
+  textButton: { color: "blue", paddingTop: 10, gap: 20 },
   button: {
     padding: 10,
     backgroundColor: "lightgray",
