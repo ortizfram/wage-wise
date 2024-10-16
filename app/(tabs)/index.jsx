@@ -16,6 +16,7 @@ import axios from "axios";
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
+  const [showSearch, setShowSearch] = React.useState(false); // Nuevo estado para controlar el renderizado de SearchOrganization
 
   useEffect(() => {
     console.log(userInfo);
@@ -80,19 +81,40 @@ export default function OrganizationList() {
             onSelectOrg={handleSelectOrg}
           />
         </>
-      ) : userInfo?.user?.data?.organization_id ? (
+      ) : userInfo?.user?.data?.organization_id && !showSearch ? (
         <InOutClock orgId={userInfo?.user?.data?.organization_id} />
       ) : (
         <>
-          <Text style={styles.blue}>
-            Envia la solicitud para ser parte de una organización
-          </Text>
-          <SearchOrganization
-            userId={userInfo._id}
-            token={userInfo.token}
-            onSelectOrg={handleSelectOrg}
-          />
+          {!showSearch && (
+            <>
+              <Text style={styles.blue}>
+                Busca el nombre de la organizacion o nombre del dueño, para enviar la solicitud y ser parte de la organización
+              </Text>
+              <SearchOrganization
+                userId={userInfo._id}
+                token={userInfo.token}
+                onSelectOrg={handleSelectOrg}
+              />
+            </>
+          )}
         </>
+      )}
+
+      {/* Pressable rojo para cambiar de establecimiento */}
+      <Pressable
+        style={styles.redButton}
+        onPress={() => setShowSearch(true)} // Al hacer clic, renderiza SearchOrganization
+      >
+        <Text style={styles.redButtonText}>Hoy estoy en otro establecimiento</Text>
+      </Pressable>
+
+      {/* Renderiza SearchOrganization si el botón rojo ha sido presionado */}
+      {showSearch && (
+        <SearchOrganization
+          userId={userInfo._id}
+          token={userInfo.token}
+          onSelectOrg={handleSelectOrg}
+        />
       )}
     </View>
   );
@@ -120,5 +142,16 @@ const styles = StyleSheet.create({
   },
   createText: {
     color: "white",
+  },
+  redButton: {
+    // backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    // marginTop: 3,
+  },
+  redButtonText: {
+    color: "red",
+    // fontWeight: "bold",
+    textAlign: "center",
   },
 });
