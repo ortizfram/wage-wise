@@ -7,12 +7,12 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ActivityIndicator, 
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { RESP_URL } from "../config";
 
-export default function SearchOrganization({ userId, token, onSelectOrg }) {
+export default function SearchOrganization({ userId, token, onSelectOrg, isAdmin }) {
   const [organizations, setOrganizations] = useState([]);
   const [filteredOrganizations, setFilteredOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +52,7 @@ export default function SearchOrganization({ userId, token, onSelectOrg }) {
       );
       setFilteredOrganizations(filtered);
     } else {
-      setFilteredOrganizations([]); // If no search query, show no results
+      setFilteredOrganizations(organizations); // Show all organizations if no search query
     }
   }, [searchQuery, organizations]);
 
@@ -70,17 +70,21 @@ export default function SearchOrganization({ userId, token, onSelectOrg }) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar organización por nombre"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      {filteredOrganizations.length > 0 ? (
+      {/* Show input only if user is not an admin */}
+      {!isAdmin && (
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar organización"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      )}
+      {isAdmin ? (
+        // Display organizations directly for admins
         <FlatList
           contentContainerStyle={styles.listContainer}
           style={styles.listBg}
-          data={filteredOrganizations}
+          data={organizations}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <Pressable
@@ -111,7 +115,44 @@ export default function SearchOrganization({ userId, token, onSelectOrg }) {
           )}
         />
       ) : (
-        <Text style={styles.noResults}>No se encontraron organizaciones</Text>
+        // Display filtered organizations for non-admins
+        filteredOrganizations.length > 0 ? (
+          <FlatList
+            contentContainerStyle={styles.listContainer}
+            style={styles.listBg}
+            data={filteredOrganizations}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => onSelectOrg(item._id)}
+                style={({ pressed }) => [
+                  {
+                    padding: 20,
+                    backgroundColor: pressed ? "#ddd" : "#f5f5f5",
+                    margin: 5,
+                    width: "100%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderRadius: 8,
+                  },
+                  styles.itemContainer,
+                ]}
+              >
+                <Image
+                  source={
+                    item.image
+                      ? { uri: `${RESP_URL}/${item.image}` }
+                      : require("../assets/images/org_placeholder.jpg")
+                  }
+                  style={styles.image}
+                />
+                <Text>{item.name}</Text>
+              </Pressable>
+            )}
+          />
+        ) : (
+          <Text style={styles.noResults}>No se encontraron organizaciones</Text>
+        )
       )}
     </View>
   );
@@ -132,7 +173,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   listBg: {
-    // backgroundColor: "gray",
     width: "100%",
   },
   listContainer: {

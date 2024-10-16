@@ -6,11 +6,10 @@ import { RESP_URL } from "../../config";
 import { AuthContext } from "../../context/AuthContext";
 
 const BePart = () => {
-  /** !user ? Login : BePart (directamente asociar a org y redirect a marcar)*/
   const { orgId } = useLocalSearchParams();
   const [organization, setOrganization] = useState(null);
   const router = useRouter();
-  const {userInfo} = useContext(AuthContext);
+  const { userInfo } = useContext(AuthContext);
 
   const associate = async () => {
     try {
@@ -21,29 +20,30 @@ const BePart = () => {
         }
       );
 
+      // Redirect for success
       if (res.status === 200 || res.status === 201) {
-        console.log(
-          "User successfully associated with the organization:",
-          res.data
-        );
+        console.log("User successfully associated with the organization:", res.data);
         router.push(`/${orgId}/bePartSent`); // Redirect to confirmation page
-      } else {
-        console.error("Failed to associate user:", res);
       }
     } catch (error) {
-      console.error("Error during association:", error);
+      // Check for status 400 to redirect
+      if (error.response && error.response.status === 400) {
+        console.error("User is already associated with the organization:", error);
+        router.push("/"); // Redirect to home page
+      } else {
+        console.error("Error during association:", error);
+      }
     }
   };
 
   useEffect(() => {
-
     const fetchOrganization = async () => {
       try {
         const response = await axios.get(
           `${RESP_URL}/api/organization/${orgId}`
         );
         setOrganization(response.data);
-        console.log(organization);
+        console.log(response.data); // Log the fetched organization data
       } catch (error) {
         console.error("Error fetching organization:", error);
       }

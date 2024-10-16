@@ -63,14 +63,19 @@ const Employees = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Employees</Text>
+      <Text style={styles.title}>Mis empleados en {organization?.name}</Text>
       {organization && (
         <View>
-          <Text>{organization._id}</Text>
+          <Text style={{ color: "blue", marginVertical: 5 }}>
+            organización: {organization._id}
+          </Text>
           <FlatList
             data={employees}
             renderItem={renderEmployee}
             keyExtractor={(item) => item._id.toString()}
+            style={styles.list} // Add a style for FlatList
+            // Optional: If you want to specify a fixed height for the FlatList
+            // contentContainerStyle={{ flexGrow: 1 }} // This helps with scrolling
           />
         </View>
       )}
@@ -82,6 +87,7 @@ export default Employees;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // Set to flex: 1 to enable scrolling
     padding: 20,
   },
   employeeContainer: {
@@ -89,5 +95,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#f9f9f9",
     borderRadius: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  list: {
+    maxHeight: 400, // Set a max height for the FlatList if needed
   },
 });

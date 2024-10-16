@@ -16,7 +16,7 @@ import axios from "axios";
 export default function OrganizationList() {
   const { userInfo, isLoading: authLoading } = useContext(AuthContext);
   const router = useRouter();
-  const [showSearch, setShowSearch] = React.useState(false); // Nuevo estado para controlar el renderizado de SearchOrganization
+  const [showSearch, setShowSearch] = React.useState(false); // State to control the render of SearchOrganization
 
   useEffect(() => {
     console.log(userInfo);
@@ -26,7 +26,7 @@ export default function OrganizationList() {
   }, [userInfo]);
 
   const handleSelectOrg = async (orgId) => {
-    /** go dashboard if i'm part of the organization,also if i'm org Admin. else Join **/
+    // Navigate to dashboard or join organization based on user relation
     try {
       const response = await axios.get(
         `${RESP_URL}/api/organization/${orgId}`,
@@ -62,6 +62,8 @@ export default function OrganizationList() {
           ? userInfo?.user?.data?.firstname
           : userInfo?.user?.email || ""}
       </Text>
+
+      {/* Admins do not see the search organization component */}
       {userInfo?.user?.isAdmin ? (
         <>
           <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
@@ -81,14 +83,15 @@ export default function OrganizationList() {
             onSelectOrg={handleSelectOrg}
           />
         </>
-      ) : userInfo?.user?.data?.organization_id && !showSearch ? (
-        <InOutClock orgId={userInfo?.user?.data?.organization_id} />
       ) : (
         <>
-          {!showSearch && (
+          {userInfo?.user?.data?.organization_id ? (
+            <InOutClock orgId={userInfo?.user?.data?.organization_id} />
+          ) : (
             <>
               <Text style={styles.blue}>
-                Busca el nombre de la organizacion o nombre del dueño, para enviar la solicitud y ser parte de la organización
+                Busca el nombre de la organización o nombre del dueño, para
+                enviar la solicitud y ser parte de la organización
               </Text>
               <SearchOrganization
                 userId={userInfo._id}
@@ -100,16 +103,20 @@ export default function OrganizationList() {
         </>
       )}
 
-      {/* Pressable rojo para cambiar de establecimiento */}
-      <Pressable
-        style={styles.redButton}
-        onPress={() => setShowSearch(true)} // Al hacer clic, renderiza SearchOrganization
-      >
-        <Text style={styles.redButtonText}>Hoy estoy en otro establecimiento</Text>
-      </Pressable>
+      {/* Button to switch establishments */}
+      {!userInfo?.user?.isAdmin && (
+        <Pressable
+          style={styles.redButton}
+          onPress={() => setShowSearch(true)} // Show search organization
+        >
+          <Text style={styles.redButtonText}>
+            Hoy estoy en otro establecimiento
+          </Text>
+        </Pressable>
+      )}
 
-      {/* Renderiza SearchOrganization si el botón rojo ha sido presionado */}
-      {showSearch && (
+      {/* Render SearchOrganization if the button has been pressed and user is not admin */}
+      {showSearch && !userInfo?.user?.isAdmin && (
         <SearchOrganization
           userId={userInfo._id}
           token={userInfo.token}
@@ -144,14 +151,11 @@ const styles = StyleSheet.create({
     color: "white",
   },
   redButton: {
-    // backgroundColor: "red",
     padding: 10,
     borderRadius: 5,
-    // marginTop: 3,
   },
   redButtonText: {
     color: "red",
-    // fontWeight: "bold",
     textAlign: "center",
   },
 });
