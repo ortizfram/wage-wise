@@ -77,28 +77,17 @@ export default function OrganizationList() {
               (+) Crea un nuevo establecimiento
             </Text>
           </Pressable>
-          <SearchOrganization
-            userId={userInfo._id}
-            token={userInfo.token}
-            onSelectOrg={handleSelectOrg}
-          />
         </>
       ) : (
         <>
-          {userInfo?.user?.data?.organization_id ? (
+          {/* Only show InOutClock if showSearch is false */}
+          {!showSearch && userInfo?.user?.data?.organization_id ? (
             <InOutClock orgId={userInfo?.user?.data?.organization_id} />
           ) : (
-            <>
-              <Text style={styles.blue}>
-                Busca el nombre de la organización o nombre del dueño, para
-                enviar la solicitud y ser parte de la organización
-              </Text>
-              <SearchOrganization
-                userId={userInfo._id}
-                token={userInfo.token}
-                onSelectOrg={handleSelectOrg}
-              />
-            </>
+            <Text style={styles.blue}>
+              Busca el nombre de la organización o nombre del dueño, para
+              enviar la solicitud y ser parte de la organización
+            </Text>
           )}
         </>
       )}
@@ -115,8 +104,8 @@ export default function OrganizationList() {
         </Pressable>
       )}
 
-      {/* Render SearchOrganization if the button has been pressed and user is not admin */}
-      {showSearch && !userInfo?.user?.isAdmin && (
+      {/* Render SearchOrganization only when showSearch is true */}
+      {showSearch && (
         <SearchOrganization
           userId={userInfo._id}
           token={userInfo.token}

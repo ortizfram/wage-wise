@@ -34,7 +34,7 @@ const CreateOrganizationView = () => {
     // Prepare data for submission
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('userId', userInfo._id);
+    formData.append('userId', userInfo?.user?._id);
 
     if (imageUri) {
       formData.append('image', {
@@ -68,22 +68,22 @@ const CreateOrganizationView = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Create an Organization</Text>
+      <Text style={styles.header}>Crear una Organización</Text>
       <TextInput
         style={styles.input}
-        placeholder="Organization name"
+        placeholder="Nombre de Organización"
         value={name}
         onChangeText={setName}
       />
       <Pressable onPress={handleChooseImage} style={styles.imagePicker}>
-        <Text style={styles.imageText}>🏞️ Choose an image</Text>
+        <Text style={styles.imageText}>🏞️ Elige una imagen</Text>
       </Pressable>
       {imageUri ? (
         <Image source={{ uri: imageUri }} style={styles.imagePreview} />
       ) : (
         <Image source={require('../../assets/images/org_placeholder.jpg')} style={styles.imagePreview} />
       )}
-      <Button title="Submit" onPress={handleSubmit} />
+      <Button title="Continuar" onPress={handleSubmit} />
     </View>
   );
 };
@@ -97,7 +97,9 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-    marginBottom: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom:16
   },
   input: {
     width: '100%',
