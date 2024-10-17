@@ -19,7 +19,7 @@ export default function OrganizationList() {
   const [showSearch, setShowSearch] = React.useState(false); // State to control the render of SearchOrganization
 
   useEffect(() => {
-    console.log(userInfo);
+    console.log("userInfo ", userInfo);
     if (!userInfo) {
       router.push("/auth/login");
     }
@@ -63,54 +63,66 @@ export default function OrganizationList() {
           : userInfo?.user?.email || ""}
       </Text>
 
-      {/* Admins do not see the search organization component */}
-      {userInfo?.user?.isAdmin ? (
-        <>
-          <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
-          <Pressable style={styles.createBtn}>
-            <Text
-              style={styles.createText}
-              onPress={() => {
-                router.push("/organization/create");
-              }}
-            >
-              (+) Crea un nuevo establecimiento
-            </Text>
-          </Pressable>
-        </>
-      ) : (
-        <>
-          {/* Only show InOutClock if showSearch is false */}
-          {!showSearch && userInfo?.user?.data?.organization_id ? (
-            <InOutClock orgId={userInfo?.user?.data?.organization_id} />
-          ) : (
-            <Text style={styles.blue}>
-              Busca el nombre de la organización o nombre del dueño, para
-              enviar la solicitud y ser parte de la organización
-            </Text>
-          )}
-        </>
-      )}
-
-      {/* Button to switch establishments */}
-      {!userInfo?.user?.isAdmin && (
-        <Pressable
-          style={styles.redButton}
-          onPress={() => setShowSearch(true)} // Show search organization
-        >
-          <Text style={styles.redButtonText}>
-            Hoy estoy en otro establecimiento
-          </Text>
-        </Pressable>
-      )}
-
-      {/* Render SearchOrganization only when showSearch is true */}
-      {showSearch && (
+      {/* Check if showSearch is true */}
+      {showSearch ? (
         <SearchOrganization
           userId={userInfo._id}
           token={userInfo.token}
           onSelectOrg={handleSelectOrg}
         />
+      ) : (
+        <>
+          {/* Admins do not see the search organization component */}
+          {userInfo?.user?.isAdmin ? (
+            <View>
+              <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
+              <Pressable style={styles.createBtn}>
+                <Text
+                  style={styles.createText}
+                  onPress={() => {
+                    router.push("/organization/create");
+                  }}
+                >
+                  (+) Crea un nuevo establecimiento
+                </Text>
+              </Pressable>
+              <SearchOrganization
+                    userId={userInfo._id}
+                    token={userInfo.token}
+                    onSelectOrg={handleSelectOrg}
+                  />
+            </View>
+          ) : (
+            <>
+              {/* Conditionally show InOutClock if orgId is present */}
+              {userInfo?.user?.data?.organization_id ? (
+                <View>
+                  <InOutClock orgId={userInfo?.user?.data?.organization_id} />
+                  <Pressable
+                    style={styles.redButton}
+                    onPress={() => setShowSearch(true)} // Set showSearch to true when clicked
+                  >
+                    <Text style={styles.redButtonText}>
+                      Hoy estoy en otro establecimiento
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <View>
+                  <Text style={styles.blue}>
+                    Busca el nombre de la organización o nombre del dueño, para
+                    enviar la solicitud y ser parte de la organización
+                  </Text>
+                  <SearchOrganization
+                    userId={userInfo._id}
+                    token={userInfo.token}
+                    onSelectOrg={handleSelectOrg}
+                  />
+                </View>
+              )}
+            </>
+          )}
+        </>
       )}
     </View>
   );
