@@ -96,14 +96,14 @@ export default function Dashboard() {
       <View style={styles.gridContainer}>
         <Pressable
           style={styles.gridItem}
-          onPress={() => router.push(`${organization._id}/employees`)}
+          onPress={() => router.push(`${organization?._id}/employees`)}
         >
           <Icon name="people" size={30} color="#007bff" />
           <Text style={styles.gridText}>Empleados</Text>
         </Pressable>
         <Pressable
           style={styles.gridItem}
-          onPress={() => router.push("/reports")}
+          onPress={() => router.push(`${organization?._id}/downloadReports`)}
         >
           <Icon name="assessment" size={30} color="#007bff" />
           <Text style={styles.gridText}>Descargar reporte mensual de {organization?.name}</Text>
