@@ -103,6 +103,13 @@ export default function Dashboard() {
         </Pressable>
         <Pressable
           style={styles.gridItem}
+          onPress={() => router.push("/reports")}
+        >
+          <Icon name="assessment" size={30} color="#007bff" />
+          <Text style={styles.gridText}>Descargar reporte mensual de {organization?.name}</Text>
+        </Pressable>
+        <Pressable
+          style={styles.gridItem}
           onPress={() => router.push("/roles")}
         >
           <Icon name="group" size={30} color="#007bff" />
@@ -122,13 +129,7 @@ export default function Dashboard() {
           <Icon name="edit" size={30} color="#007bff" />
           <Text style={styles.gridText}>Corregir un Registro</Text>
         </Pressable>
-        <Pressable
-          style={styles.gridItem}
-          onPress={() => router.push("/reports")}
-        >
-          <Icon name="assessment" size={30} color="#007bff" />
-          <Text style={styles.gridText}>Reportes</Text>
-        </Pressable>
+     
         {/* <Pressable
           style={styles.gridItem}
           onPress={() => router.push("/salary-advance")}
