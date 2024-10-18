@@ -74,7 +74,7 @@ const Index = () => {
           style={styles.gridItem}
           onPress={() => router.push(`${empId}/report`)}
         >
-          <Text style={styles.gridText}>🕒 Reporte de Horas</Text>
+          <Text style={styles.gridText}>🕒 Ver Reporte de Horas</Text>
         </Pressable>
 
         <Text style={styles.sectionTitle}>Editar valores</Text>
