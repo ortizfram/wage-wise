@@ -108,13 +108,13 @@ export default function Dashboard() {
           <Icon name="group" size={30} color="#007bff" />
           <Text style={styles.gridText}>Roles</Text>
         </Pressable>
-        <Pressable
+        {/* <Pressable
           style={styles.gridItem}
           onPress={() => router.push("/alerts")}
         >
           <Icon name="notifications" size={30} color="#007bff" />
           <Text style={styles.gridText}>Alertas</Text>
-        </Pressable>
+        </Pressable> */}
         <Pressable
           style={styles.gridItem}
           onPress={() => router.push("/correct-record")}
@@ -129,13 +129,13 @@ export default function Dashboard() {
           <Icon name="assessment" size={30} color="#007bff" />
           <Text style={styles.gridText}>Reportes</Text>
         </Pressable>
-        <Pressable
+        {/* <Pressable
           style={styles.gridItem}
           onPress={() => router.push("/salary-advance")}
         >
           <Icon name="monetization-on" size={30} color="#007bff" />
           <Text style={styles.gridText}>Adelanto de Sueldo</Text>
-        </Pressable>
+        </Pressable> */}
       </View>
       <Pressable style={styles.deleteButton} onPress={confirmDelete}>
         <Icon name="delete" size={24} color="white" />
