@@ -95,37 +95,37 @@ const Report = () => {
     let hours = 0;
     let minutes = 0;
     let holidayMinutes = 0;
-  
+
     // Sum up the total hours and minutes from the shifts
     shifts.forEach((shift) => {
       const [h, m] = shift.total_hours.split(" ");
       hours += parseInt(h.replace("h", ""));
       minutes += parseInt(m.replace("m", ""));
-  
+
       if (shift.shift_mode === "holiday") {
         holidayMinutes +=
           parseInt(h.replace("h", "")) * 60 + parseInt(m.replace("m", ""));
       }
     });
-  
+
     // Adjust hours and minutes
     hours += Math.floor(minutes / 60);
     minutes = minutes % 60;
-  
+
     setTotalHours(hours);
     setTotalMinutes(minutes);
-  
+
     const workedMinutes = hours * 60 + minutes;
     setWorkedTimeMinutes(workedMinutes);
-  
+
     const hourlyFee = employee.hourly_fee || 0;
     const travelCost = employee.travel_cost || 0;
     const bonusPrize = employee.bonus_prize || 0; // Add bonus_prize
-  
+
     const regularCost = (workedMinutes / 60) * hourlyFee;
     const holidayCostValue = (holidayMinutes / 60) * hourlyFee;
     setHolidayCost(Math.floor(holidayCostValue));
-  
+
     // Calculating total cost (including bonus, advance, and bonus_prize)
     const totalCostValue =
       regularCost +
@@ -134,33 +134,32 @@ const Report = () => {
       parseFloat(bonus) +
       parseFloat(bonusPrize) - // Include bonus_prize in total
       parseFloat(advance);
-  
+
     setTotalCost(totalCostValue.toFixed(2));
-  
+
     // Handle declared hours and excedente
     const declaredMinutes = employee.declared_hours || 0;
     const excedenteMinutes = workedMinutes - declaredMinutes;
-  
+
     if (excedenteMinutes <= 0) {
       setExcedente("0h 0m");
       setExcedenteCost("0");
       return; // No excedente if worked time is less than declared time
     }
-  
+
     // Convert excedenteMinutes to hours and minutes
     const excedenteHours = Math.floor(excedenteMinutes / 60);
     const excedenteRemainingMinutes = excedenteMinutes % 60;
     setExcedente(`${excedenteHours}h ${excedenteRemainingMinutes}m`);
-  
+
     setExcedenteMin(convertExcedenteToMinutes(excedente));
-  
+
     setExcedenteCost(
       Math.floor(
         excedenteMin * (employee.hourly_fee / 60) + employee.travel_cost
       )
     );
   };
-  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -177,15 +176,16 @@ const Report = () => {
               <Text style={styles.employeeText}>{employee.email}</Text>
             )}
 
-            <View>
+            <View style={styles.reportContainer}>
               <Text style={styles.title}>
                 Horas Totales: {totalHours}h {totalMinutes}m
               </Text>
-              <Text style={styles.employeeText}>
+
+              <Text style={styles.detailsText}>
                 Tarifa Horaria: ${employee.hourly_fee || 0} | Costo Viaje: $
-                {employee.travel_cost || 0} | Premio: ${employee.bonus_prize || 0} |
-                {` Excedente: ${excedente} (${excedenteMin}m)`} | Feriados: $
-                {holidayCost || 0}
+                {employee.travel_cost || 0} | Premio: $
+                {employee.bonus_prize || 0} | Excedente: {excedente} (
+                {excedenteMin}m) | Feriados: ${holidayCost || 0}
               </Text>
 
               <View style={styles.editableRow}>
@@ -199,14 +199,11 @@ const Report = () => {
                 />
               </View>
 
-              {/* <Text style={styles.excedenteText}>
-              Excedente: {employee.declaredHours > 0 ? (workedTimeMinutes - employee.declaredHours) : 0}m
-            </Text> */}
               <Text style={styles.excedenteText}>
-                Excedente: $ {excedenteCost}
+                Excedente: ${excedenteCost}
               </Text>
 
-              <Text style={styles.largeText}>Total: ${totalCost}</Text>
+              <Text style={styles.totalText}>Total: ${totalCost}</Text>
             </View>
           </View>
         ) : (
@@ -417,5 +414,56 @@ const styles = StyleSheet.create({
     color: "gray", // Optional color to differentiate
     textAlign: "center",
     marginTop: 10, // Add space above
+  },
+  reportContainer: {
+    padding: 15,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  detailsText: {
+    fontSize: 16,
+    color: "#555",
+    marginBottom: 15,
+  },
+  editableRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    flex: 1,
+    color: "#333",
+  },
+  input: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 8,
+    flex: 2,
+    marginLeft: 10,
+  },
+  excedenteText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#c00",
+  },
+  totalText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#28a745",
   },
 });
