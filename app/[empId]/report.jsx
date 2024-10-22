@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import ViewShot, { captureRef } from "react-native-view-shot";
+
 const Report = () => {
+  const viewRef = useRef();
   const { empId } = useLocalSearchParams();
   const [employee, setEmployee] = useState({});
   const [shifts, setShifts] = useState([]);
@@ -161,9 +164,22 @@ const Report = () => {
     );
   };
 
+  const downloadReport = async () => {
+    try {
+      const uri = await captureRef(viewRef, {
+        format: "png",
+        quality: 0.8,
+      });
+      console.log("Reporte descargado en:", uri);
+      // Aquí puedes agregar lógica para guardar la imagen, compartirla, etc.
+    } catch (error) {
+      console.error("Error al descargar el reporte:", error);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
+      <ViewShot ref={viewRef} style={styles.container}>
         <Text style={styles.title}>Reporte de Horas</Text>
 
         {employee && employee.email ? (
@@ -260,6 +276,11 @@ const Report = () => {
           </View>
         )}
 
+        {shifts.length > 0 && (
+          <Pressable style={styles.downloadButton} onPress={downloadReport}>
+            <Text style={styles.downloadButtonText}>Descargar Reporte</Text>
+          </Pressable>
+        )}
         {shifts.length > 0 ? (
           shifts.map((shift, index) => (
             <View key={index} style={styles.shiftContainer}>
@@ -290,7 +311,7 @@ const Report = () => {
             No se encontraron turnos para las fechas seleccionadas
           </Text>
         )}
-      </View>
+      </ViewShot>
     </ScrollView>
   );
 };
