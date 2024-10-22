@@ -263,19 +263,24 @@ const Report = () => {
         {shifts.length > 0 ? (
           shifts.map((shift, index) => (
             <View key={index} style={styles.shiftContainer}>
-              {shift.shift_mode === "holiday" ? (
-                <View style={styles.star}>
-                  <Text style={styles.starText}>F</Text>
-                </View>
-              ) : (
-                <View style={styles.circle}>
-                  <Text style={styles.circleText}>R</Text>
-                </View>
-              )}
+              <View
+                style={
+                  shift.shift_mode === "holiday" ? styles.star : styles.circle
+                }
+              >
+                <Text
+                  style={
+                    shift.shift_mode === "holiday"
+                      ? styles.starText
+                      : styles.circleText
+                  }
+                >
+                  {shift.shift_mode === "holiday" ? "F" : "R"}
+                </Text>
+              </View>
               <Text style={styles.shiftText}>
-                {shift.date} -{" "}
-                <Text style={{ color: "green" }}> {shift.in}</Text> -{" "}
-                <Text style={{ color: "red" }}> {shift.out}</Text> - Horas:{" "}
+                {shift.date} - <Text style={styles.inText}>{shift.in}</Text> -{" "}
+                <Text style={styles.outText}>{shift.out}</Text> - Horas:{" "}
                 {shift.total_hours}
               </Text>
             </View>
@@ -292,6 +297,59 @@ const Report = () => {
 
 export default Report;
 const styles = StyleSheet.create({
+  shiftContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    backgroundColor: "#ffffff",
+  },
+  star: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "yellow",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#007BFF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  starText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  circleText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  shiftText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inText: {
+    color: "green",
+    fontWeight: "bold",
+  },
+  outText: {
+    color: "red",
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginVertical: 10,
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
