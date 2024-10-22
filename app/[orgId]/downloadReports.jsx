@@ -51,17 +51,23 @@ const DownloadReports = () => {
   }, [orgId]);
 
   const onStartDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || startDate;
-    setStartDate(currentDate);
-    if (Platform.OS !== "web") {
+    if (Platform.OS === "web") {
+      // For web, selectedDate is passed directly
+      setStartDate(event); // The 'event' is the date selected in react-datepicker for web
+    } else {
+      const currentDate = selectedDate || startDate;
+      setStartDate(currentDate);
       setShowStartDatePicker(Platform.OS === "ios");
     }
   };
 
   const onEndDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || endDate;
-    setEndDate(currentDate);
-    if (Platform.OS !== "web") {
+    if (Platform.OS === "web") {
+      // For web, selectedDate is passed directly
+      setEndDate(event); // The 'event' is the date selected in react-datepicker for web
+    } else {
+      const currentDate = selectedDate || endDate;
+      setEndDate(currentDate);
       setShowEndDatePicker(Platform.OS === "ios");
     }
   };
@@ -249,6 +255,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    width: "40%",
   },
   downloadButtonText: {
     color: "#fff",
