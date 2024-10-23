@@ -14,8 +14,10 @@ import { useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
 import ViewShot, { captureRef } from "react-native-view-shot";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import * as MediaLibrary from "expo-media-library";
 
 const Report = () => {
   const viewRef = useRef();
@@ -164,16 +166,68 @@ const Report = () => {
     );
   };
 
+  // Método para descargar o compartir el reporte según la plataforma
   const downloadReport = async () => {
     try {
       const uri = await captureRef(viewRef, {
         format: "png",
         quality: 0.8,
       });
-      console.log("Reporte descargado en:", uri);
-      // Aquí puedes agregar lógica para guardar la imagen, compartirla, etc.
+
+      console.log("Reporte generado en:", uri);
+
+      if (Platform.OS === "web") {
+        downloadWeb(uri);
+      } else {
+        await downloadMobile(uri);
+      }
     } catch (error) {
       console.error("Error al descargar el reporte:", error);
+      Alert.alert("Error", "No se pudo descargar el reporte.");
+    }
+  };
+
+  // Lógica específica para descarga en web
+  const downloadWeb = (uri) => {
+    const link = document.createElement("a");
+    link.href = uri;
+    link.download = "reporte.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    console.log("Reporte descargado en Web");
+  };
+
+  // Lógica específica para iOS y Android
+  const downloadMobile = async (uri) => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permiso requerido",
+        "Se requiere permiso para guardar el archivo."
+      );
+      return;
+    }
+
+    const fileUri = `${FileSystem.documentDirectory}reporte.png`;
+
+    // Guardar el archivo en el sistema de archivos local
+    await FileSystem.copyAsync({
+      from: uri,
+      to: fileUri,
+    });
+
+    if (Platform.OS === "ios") {
+      // Usar el componente de compartir para iOS
+      await Sharing.shareAsync(fileUri);
+    } else {
+      // Guardar el archivo en la galería en Android
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
+      await MediaLibrary.createAlbumAsync("Reportes", asset, false);
+      Alert.alert(
+        "Reporte Guardado",
+        "El reporte se ha guardado en tu galería."
+      );
     }
   };
 
