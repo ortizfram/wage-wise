@@ -9,7 +9,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import Spinner from "react-native-loading-spinner-overlay";
+import Spinner from "react-native-loading-spinner-overlay";   
 
 const Signup = () => {
   const [email, setEmail] = useState(null);
