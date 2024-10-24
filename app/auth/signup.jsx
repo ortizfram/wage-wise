@@ -17,7 +17,7 @@ const Signup = () => {
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
 
-  const { register, isLoading } = useContext(AuthContext);
+  const { register, isLoading } = useContext(AuthContext) || {};
   const router = useRouter();
 
   return (

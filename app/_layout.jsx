@@ -1,59 +1,38 @@
-import { Stack } from "expo-router";
-import { useFonts } from "expo-font";
+import { useEffect, useContext, useState } from "react";
+import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useContext } from "react";
-import "react-native-reanimated";
+import { AuthContext } from "../context/AuthContext";
 
-import { AuthContext, AuthProvider } from "../context/AuthContext";
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
+export default function Layout() {
+  const { userInfo, splashLoading } = useContext(AuthContext) || {};
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <AuthProvider>
-      <Layout />
-    </AuthProvider>
-  );
-}
-
-function Layout() {
-  const { userInfo, splashLoading } = useContext(AuthContext);
+    setIsMounted(true); // Set mounted to true when the component mounts
+  }, []);
 
   useEffect(() => {
-    if (userInfo == null) {
+    if (isMounted && !userInfo?.user?._id) {
+      // Only attempt to navigate after mounting
       router.push("/auth/login");
     }
-  }, [splashLoading, userInfo]);
+  }, [userInfo, isMounted]);
 
   return (
     <Stack>
-      {splashLoading ? (
-        <Stack.Screen name="splashScreen" options={{ headerShown: false }} />
-      ) : userInfo?.token ? (
-        <>
+      {/* Protected routes */}
+      {userInfo?.token ? (
+        <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="organization" options={{ headerShown: false }} />
-        </>
+        </Stack>
       ) : (
-        <>
+        // Authentication routes
+        <Stack>
           <Stack.Screen name="auth/signup" options={{ headerShown: false }} />
           <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-        </>
+        </Stack>
       )}
 
       <Stack.Screen name="+not-found" />

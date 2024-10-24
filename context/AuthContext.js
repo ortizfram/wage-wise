@@ -8,8 +8,8 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [splashLoading, setSplashLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState({});
+  const [splashLoading, setSplashLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
 
   const updateUserInfo = (updatedUser) => {
@@ -165,7 +165,6 @@ export const AuthProvider = ({ children }) => {
 
   const isLoggedIn = async () => {
     try {
-      setSplashLoading(true);
       let userInfo = await AsyncStorage.getItem("userInfo");
       userInfo = JSON.parse(userInfo);
       if (userInfo) {

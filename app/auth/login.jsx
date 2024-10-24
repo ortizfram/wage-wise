@@ -7,12 +7,13 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import { AuthContext } from "../../context/AuthContext";
 import Spinner from "react-native-loading-spinner-overlay";
 import { Link } from "expo-router";
+import { AuthContext } from "../../context/AuthContext";
 
 const Login = () => {
-  const { login, loginWithGoogle, loginWithFacebook, isLoading } = useContext(AuthContext);
+  const { login, loginWithGoogle, loginWithFacebook, isLoading } =
+    useContext(AuthContext) || {};
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,16 +49,22 @@ const Login = () => {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {/* Display error if exists */}
-      
+
       <Pressable onPress={handleLogin} style={styles.button}>
         <Text style={styles.textButton}>Ingresar</Text>
       </Pressable>
-      
-      <Pressable onPress={loginWithGoogle} style={[styles.button, styles.googleButton]}>
+
+      <Pressable
+        onPress={loginWithGoogle}
+        style={[styles.button, styles.googleButton]}
+      >
         <Text style={styles.textButton}>Ingresar con Google</Text>
       </Pressable>
-      
-      <Pressable onPress={loginWithFacebook} style={[styles.button, styles.facebookButton]}>
+
+      <Pressable
+        onPress={loginWithFacebook}
+        style={[styles.button, styles.facebookButton]}
+      >
         <Text style={styles.textButton}>Ingresar con Facebook</Text>
       </Pressable>
 

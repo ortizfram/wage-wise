@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,19 +14,28 @@ import { RESP_URL } from "../../config";
 import axios from "axios";
 
 export default function OrganizationList() {
-  const { userInfo, isLoading: authLoading } = useContext(AuthContext);
+  const { userInfo, isLoading: authLoading } = useContext(AuthContext) || {};
   const router = useRouter();
-  const [showSearch, setShowSearch] = React.useState(false); // State to control the render of SearchOrganization
+  const [showSearch, setShowSearch] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    console.log("userInfo ", userInfo);
-    if (!userInfo) {
+    setIsMounted(true); // Set mounted to true when the component mounts
+  }, []);
+
+  useEffect(() => {
+    if (isMounted && !userInfo?.user?._id) {
+      // Only attempt to navigate after mounting
       router.push("/auth/login");
     }
-  }, [userInfo]);
+  }, [userInfo, isMounted]);
+
+  if (!userInfo?.user?._id || authLoading) {
+    // Return loading indicator until userInfo is available
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   const handleSelectOrg = async (orgId) => {
-    // Navigate to dashboard or join organization based on user relation
     try {
       const response = await axios.get(
         `${RESP_URL}/api/organization/${orgId}`,
@@ -40,7 +49,7 @@ export default function OrganizationList() {
       );
 
       const organization = response.data;
-      if (organization.user_id === userInfo?.user?._id) {
+      if (organization?.user_id === userInfo?.user?._id) {
         router.push(`/${orgId}/dashboard`);
       } else {
         router.push(`/${orgId}/bePart`);
@@ -66,13 +75,12 @@ export default function OrganizationList() {
       {/* Check if showSearch is true */}
       {showSearch ? (
         <SearchOrganization
-          userId={userInfo._id}
+          userId={userInfo?._id}
           token={userInfo.token}
           onSelectOrg={handleSelectOrg}
         />
       ) : (
         <>
-          {/* Admins do not see the search organization component */}
           {userInfo?.user?.isAdmin ? (
             <View>
               <Text style={styles.blue}>Elige tu Establecimiento, o</Text>
@@ -87,20 +95,19 @@ export default function OrganizationList() {
                 </Text>
               </Pressable>
               <SearchOrganization
-                    userId={userInfo._id}
-                    token={userInfo.token}
-                    onSelectOrg={handleSelectOrg}
-                  />
+                userId={userInfo?._id}
+                token={userInfo.token}
+                onSelectOrg={handleSelectOrg}
+              />
             </View>
           ) : (
             <>
-              {/* Conditionally show InOutClock if orgId is present */}
               {userInfo?.user?.data?.organization_id ? (
                 <View>
                   <InOutClock orgId={userInfo?.user?.data?.organization_id} />
                   <Pressable
                     style={styles.redButton}
-                    onPress={() => setShowSearch(true)} // Set showSearch to true when clicked
+                    onPress={() => setShowSearch(true)}
                   >
                     <Text style={styles.redButtonText}>
                       Hoy estoy en otro establecimiento
@@ -114,8 +121,8 @@ export default function OrganizationList() {
                     enviar la solicitud y ser parte de la organización
                   </Text>
                   <SearchOrganization
-                    userId={userInfo._id}
-                    token={userInfo.token}
+                    userId={userInfo?._id}
+                    token={userInfo?.token}
                     onSelectOrg={handleSelectOrg}
                   />
                 </View>
